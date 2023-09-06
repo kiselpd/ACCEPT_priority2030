@@ -60,7 +60,7 @@ struct SensorsData // отправляется с есп на сервер
     RelayData solar;
     RelayData wind;
     RelayData generator;
-    double battery_voltage;
+    uint16_t battery_voltage;
     RelayData consumer[CONSUMERS_NUMBER];
 };
 
@@ -69,7 +69,7 @@ struct FullRelayData
     double voltage;
     double current;
     double power;
-    double percentages;
+    int percentages;
     bool status;
 };
 

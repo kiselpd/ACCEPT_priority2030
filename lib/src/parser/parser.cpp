@@ -76,7 +76,7 @@ std::string full_sensors_data_to_json(const FullSensorsData& t_struct){
 
         json_data[field_name::energy_source::BAT] = nlohmann::json::array(
             {(double)t_struct.battery.voltage,
-            (double)t_struct.battery.percentages,
+            (int)t_struct.battery.percentages,
             (size_t)t_struct.battery.status});
 
         for(size_t consumer_number = 1; consumer_number <= CONSUMERS_NUMBER; consumer_number++)

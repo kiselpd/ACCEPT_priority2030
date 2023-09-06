@@ -155,6 +155,7 @@ void ClientMessenger::on_send_(std::shared_ptr<BaseMessage> message){
         this->send_handler_(error, bytes_transferred);
     };
 
+    std::cout << message->getJson() << std::endl;
     socket_->async_write_some(
         boost::asio::buffer(message->getJson()),
         send_handler

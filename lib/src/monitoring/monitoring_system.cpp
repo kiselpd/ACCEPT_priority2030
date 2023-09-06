@@ -41,9 +41,9 @@ FullSensorsData SensorsDataCondition::calculateFullSensorsData_(const SensorsDat
 
 FullBatteryData SensorsDataCondition::calculateFullBatteryData_(const SensorsData& sensors_data) const{
     FullBatteryData bat;
-    bat.voltage = sensors_data.battery_voltage;
-    bat.percentages = (bat.voltage - 7.2) / 5.4;
-    bat.status = 1;
+    bat.voltage = sensors_data.battery_voltage * 3.3 * 5.3 / 4096;
+    bat.percentages = (bat.voltage - 7.2) / 5.4 * 100;
+    bat.status = ((sensors_data.solar.current + sensors_data.wind.current + sensors_data.generator.current) - (sensors_data.consumer[0].current + sensors_data.consumer[1].current + sensors_data.consumer[2].current) > 0) ? (1) : (0);
 
     return bat;
 };
