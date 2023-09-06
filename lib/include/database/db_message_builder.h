@@ -1,0 +1,6 @@
+#ifndef DB_MESSAGE_BUIDER_H
+#define DB_MESSAGE_BUIDER_H
+
+
+
+#endif /*DB_MESSAGE_BUIDER_H*/
