@@ -3,10 +3,21 @@
 
 #include <iostream>
 #include <memory>
+#include <vector>
 
 #define MAX 4
 
 const size_t CONSUMERS_NUMBER = 3;
+
+enum EspStructType
+{
+    SUCCESS = 0,
+    ERROR,
+    AUTH,
+    SENSORS_DATA,
+    SWITCH_RELAY = 5,
+    SWITCH_MODE
+};
 
 enum Type
 {
@@ -18,8 +29,9 @@ enum Type
     SWITCH_RELAY, //Клиент отправляет запрос на переключение реле на сервер, а сервер на есп.
     MODE, //Клиент отправляет запрос на сервер по режиму работы есп, а сервер отправляет на есп
     DAY_POWER_DATA, //Сервер отправляет клиенту информацию о графиках
-    SHUTDOWN = 9,//Желательно чтобы это отправлял клиент и есп, когда они отключаются
-    PING
+    ESP_STATUS,
+    PING,
+    SHUTDOWN//Желательно чтобы это отправлял клиент и есп, когда они отключаются
 };
 
 struct StructType // отправляется на есп первой, с типом и размером следующей структуры
@@ -108,6 +120,7 @@ struct Mode // отправляется на есп о режиме работы
     double k; // какой-то коэффициент лучше пусть будет
 };
 
+typedef std::pair<size_t, std::vector<std::vector<std::string>>> DBResult;
 
 
 #endif /*ADDITIONAL_H*/

@@ -16,13 +16,10 @@ void SessionManager::createSession(std::shared_ptr<boost::asio::ip::tcp::socket>
         auto new_session = auth_->authorizeNewSession(new_socket);
         if(new_session){
             auto session_it = collection_->findSession(new_session->getId(), new_session->getOwner());
-            if(session_it == collection_->end()){
-                std::cout << "Add" << std::endl;
-            }
-            else{
+            if(session_it != collection_->end())
                 collection_->removeSession(session_it);
-            }
-                collection_->addSession(new_session);
+
+            collection_->addSession(new_session);
 
             auto friend_session_it = collection_->findSession(new_session->getId(), new_session->getFriend());
             if(friend_session_it != collection_->end()){
@@ -30,6 +27,7 @@ void SessionManager::createSession(std::shared_ptr<boost::asio::ip::tcp::socket>
                 std::shared_ptr<SessionMediator> mediator = std::make_shared<SessionMediator>();
                 std::cout << "mediator: " << mediator.get() << std::endl;
                 new_session->linkMediator(mediator);
+                (*friend_session_it)->unlinkMediator();
                 (*friend_session_it)->linkMediator(mediator);
             }
             else

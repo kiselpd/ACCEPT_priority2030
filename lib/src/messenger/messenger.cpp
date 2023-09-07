@@ -21,33 +21,6 @@ void BaseMessenger::getNotification(const Notification& notification){
 
 Addressee BaseMessenger::getName() const {return Addressee::Messenger;};
 
-// class EspMessenger : public BaseMessenger
-// {
-// public:
-//     EspMessenger(std::shared_ptr<boost::asio::ip::tcp::socket> socket, std::shared_ptr<boost::asio::deadline_timer> timer, const size_t& waiting_in_second = DEFAULT_ESP_WAITING_IN_SECOND);
-
-// private:
-//     void on_start_() override;
-//     void on_send_(std::shared_ptr<BaseMessage> message) override;
-
-//     void on_read_();
-//     void on_wait_();
-//     void on_process_();
-
-//     void wait_handler_(const boost::system::error_code& error);
-//     void read_handler_(const boost::system::error_code& error, std::size_t bytes_transferred);
-//     void send_handler_(const boost::system::error_code& error, std::size_t bytes_transferred);
-
-//     std::shared_ptr<boost::asio::ip::tcp::socket> socket_;
-//     std::shared_ptr<boost::asio::deadline_timer> timer_;
-
-//     size_t waiting_in_second_;
-
-//     Type type;
-//     const size_t buffer_size_ = 2048; 
-//     char buffer_[2048]{0};
-// };
-
 // EspMessenger
 EspMessenger::EspMessenger(std::shared_ptr<boost::asio::ip::tcp::socket> socket, std::shared_ptr<boost::asio::deadline_timer> timer, const size_t& waiting_in_second) :
     socket_(socket),
@@ -56,17 +29,29 @@ EspMessenger::EspMessenger(std::shared_ptr<boost::asio::ip::tcp::socket> socket,
 
 void EspMessenger::on_start_(){
     on_wait_();
-    on_read_();
+    on_read_type_();
 };
 
-void EspMessenger::on_read_(){
+void EspMessenger::on_read_type_(){
     auto read_handler = [this](const boost::system::error_code& error, std::size_t bytes_transferred) {
-        this->read_handler_(error, bytes_transferred);
+        this->read_type_handler_(error, bytes_transferred);
     };
     
     boost::asio::async_read(
         *socket_,
-        boost::asio::buffer(buffer_, 160),
+        boost::asio::buffer(buffer_.getTypeBuffer(), 8),
+        read_handler
+    );
+};
+
+void EspMessenger::on_read_struct_(){
+    auto read_handler = [this](const boost::system::error_code& error, std::size_t bytes_transferred) {
+        this->read_struct_handler_(error, bytes_transferred);
+    };
+    
+    boost::asio::async_read(
+        *socket_,
+        boost::asio::buffer(buffer_.getStructBuffer(), buffer_.getSize()),
         read_handler
     );
 };
@@ -93,22 +78,35 @@ void EspMessenger::on_send_(std::shared_ptr<BaseMessage> message){
 };
 
 void EspMessenger::on_process_(){
-    std::shared_ptr<char[]> type_buffer{new char[sizeof(StructType)]};
-    std::memcpy(type_buffer.get(), &buffer_, sizeof(StructType));
-    StructType* t_struct = reinterpret_cast<StructType*>(type_buffer.get());
-
-    std::cout << t_struct->type << " " << t_struct->size << std::endl;
-    char *r = &(buffer_[8]);
-    if(t_struct->type == Type::SENSORS_DATA){
-        std::cout << "Get sensors data" << std::endl;
+    switch (buffer_.getType())
+    {
+    case Type::SENSORS_DATA:
+    {
         std::shared_ptr<char[]> struct_buffer{new char[sizeof(SensorsData)]};
-        std::memcpy(struct_buffer.get(), r, sizeof(SensorsData));
-        SensorsData* str = reinterpret_cast<SensorsData*>(struct_buffer.get());
-        std::cout << str->battery_voltage << std::endl;
-        this->notifyDispatcher(Notification{Addressee::Monitoring_System, std::make_shared<SensorsDataMessage>(*str)});
-
+        std::memcpy(struct_buffer.get(), buffer_.getStructBuffer(), sizeof(SensorsData));
+        SensorsData* t_struct = reinterpret_cast<SensorsData*>(struct_buffer.get());
+        this->notifyDispatcher(Notification{Addressee::Monitoring_System, std::make_shared<SensorsDataMessage>(*t_struct)});
+        break;
     }
-    std::fill(std::begin(buffer_), std::end(buffer_), 0);
+    case Type::SUCCESS:
+    {
+        std::shared_ptr<char[]> struct_buffer{new char[sizeof(StructType)]};
+        std::memcpy(struct_buffer.get(), buffer_.getStructBuffer(), sizeof(StructType));
+        StructType* t_struct = reinterpret_cast<StructType*>(struct_buffer.get());
+        this->notifyDispatcher(Notification{Addressee::Monitoring_System, std::make_shared<TypeMessage>((Type)t_struct->type)});
+        break;
+    }
+    case Type::ERROR:
+    {
+        std::shared_ptr<char[]> struct_buffer{new char[sizeof(StructType)]};
+        std::memcpy(struct_buffer.get(), buffer_.getStructBuffer(), sizeof(StructType));
+        StructType* t_struct = reinterpret_cast<StructType*>(struct_buffer.get());
+        this->notifyDispatcher(Notification{Addressee::Monitoring_System, std::make_shared<TypeMessage>((Type)t_struct->type)});
+        break;
+    }
+    default:
+        break;
+    }
 };
 
 void EspMessenger::wait_handler_(const boost::system::error_code& error){
@@ -118,7 +116,26 @@ void EspMessenger::wait_handler_(const boost::system::error_code& error){
     }
 };
 
-void EspMessenger::read_handler_(const boost::system::error_code& error, std::size_t bytes_transferred){
+void EspMessenger::read_type_handler_(const boost::system::error_code& error, std::size_t bytes_transferred){
+    timer_->cancel();
+    std::cout << "bytes trans" << bytes_transferred << std::endl;
+    if(!error && bytes_transferred){
+        if(buffer_.convertTypeBuffer()){
+            this->on_wait_();
+            this->on_read_struct_();
+        }
+        else{
+            this->on_process_();
+            this->on_start_();
+        }
+    }
+    else{
+        socket_->close();
+        this->stop();
+    }
+};
+
+void EspMessenger::read_struct_handler_(const boost::system::error_code& error, std::size_t bytes_transferred){
     timer_->cancel();
     std::cout << "bytes trans" << bytes_transferred << std::endl;
     if(!error && bytes_transferred){
@@ -163,14 +180,12 @@ void ClientMessenger::on_send_(std::shared_ptr<BaseMessage> message){
 };
 
 void ClientMessenger::on_read_(){
-    buffer_.clear();
-    buffer_.resize(this->buffer_size_);
     auto read_handler = [this](const boost::system::error_code& error, std::size_t bytes_transferred) {
         this->read_handler_(error, bytes_transferred);
     };
     
     socket_->async_read_some(
-        boost::asio::buffer(buffer_),
+        boost::asio::buffer(buffer_.get()),
         read_handler
     );
 };
@@ -184,11 +199,10 @@ void ClientMessenger::on_wait_(){
 };
 
 void ClientMessenger::on_process_(){
-    std::string json_str(buffer_.begin(), buffer_.end());
     std::shared_ptr<BaseMessage> message;
     Addressee addressee;
-
-    switch (get_type_from_json(json_str))
+    std::cout << buffer_.getString() << std::endl;
+    switch (get_type_from_json(buffer_.getString()))
     {
     case Type::SWITCH_RELAY:
         message = std::make_shared<SwitchRelayMessage>();
@@ -202,39 +216,30 @@ void ClientMessenger::on_process_(){
         timer_->cancel();
         socket_->cancel();
         this->stop();
-        break;
-    
+        return;
+
+    case Type::PING:
+        this->on_ping_();
+        return;
     default:
         break;
     }
 
-    message->setJson(get_data_from_json(json_str));
+    message->setJson(get_data_from_json(buffer_.getString()));
     this->notifyDispatcher(Notification{Addressee::Mediator, message});
     
 };
 
 void ClientMessenger::on_ping_(){
     std::shared_ptr<BaseMessage> message = std::make_shared<TypeMessage>(Type::PING);
-    std::cout << "on ping" << std::endl;
     this->on_send_(message);
 };
 
 void ClientMessenger::wait_handler_(const boost::system::error_code& error){
     if(!error){
-        if(this->is_active_.load(std::memory_order_relaxed)){
-            this->is_active_.store(false, std::memory_order_relaxed);
-            this->on_wait_();
-            this->on_ping_();
-            std::cout << "wait on ping" << std::endl;
-        }
-        else{
-            socket_->close();
-            std::cout << "wait on stop" << std::endl;
-            this->stop();
-        }
+        socket_->close();
+        this->stop();
     }
-    else
-        std::cout << "not ping" << std::endl;
 };
 
 void ClientMessenger::read_handler_(const boost::system::error_code& error, std::size_t bytes_transferred){

@@ -53,4 +53,15 @@ public:
 };
 
 
+class DBAnswerBody
+{
+public:
+    DBAnswerBody(const std::string& answer_body);
+
+    size_t _count;
+    std::vector<std::vector<std::string>> _value;
+};
+
+std::pair<size_t, DBAnswerBody> parseAnswer(const std::string& answer);
+
 #endif /*DB_MESSAGE_H*/

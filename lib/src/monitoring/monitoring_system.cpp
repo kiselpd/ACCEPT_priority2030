@@ -41,8 +41,10 @@ FullSensorsData SensorsDataCondition::calculateFullSensorsData_(const SensorsDat
 
 FullBatteryData SensorsDataCondition::calculateFullBatteryData_(const SensorsData& sensors_data) const{
     FullBatteryData bat;
-    bat.voltage = sensors_data.battery_voltage * 3.3 * 5.3 / 4096;
-    bat.percentages = (bat.voltage - 7.2) / 5.4 * 100;
+    std::cout << sensors_data.battery_voltage << std::endl;
+    double tmp_voltage = sensors_data.battery_voltage * 3.3 * 5.3 / 4096;
+    bat.voltage = tmp_voltage + (0.00028*(1+0.0001*(tmp_voltage - 12.5))*(sensors_data.consumer[0].current / 1000 + sensors_data.consumer[1].current / 1000 + sensors_data.consumer[2].current / 1000 - sensors_data.solar.current / 2000 - sensors_data.wind.current / 2000 - sensors_data.generator.current * 4000));
+    bat.percentages = (bat.voltage / 13.5) * 100;
     bat.status = ((sensors_data.solar.current + sensors_data.wind.current + sensors_data.generator.current) - (sensors_data.consumer[0].current + sensors_data.consumer[1].current + sensors_data.consumer[2].current) > 0) ? (1) : (0);
 
     return bat;
@@ -64,7 +66,6 @@ FullRelayData SensorsDataCondition::calculateFullSensorData_(const RelayData& se
 void MonitoringSystem::getNotification(const Notification& notification){
     auto message = notification.getMessage();
 
-    std::cout << "I.m here" << std::endl;
     switch (message->getType())
     {
     case Type::MODE:
@@ -72,6 +73,16 @@ void MonitoringSystem::getNotification(const Notification& notification){
         auto t_struct = std::get<Mode>(message->getStruct());
         this->getModeRequest_(t_struct);
         break;
+    }
+    case Type::SUCCESS:
+    {
+        // this->getModeRequest_(message->getType());
+        // break;
+    }
+    case Type::ERROR:
+    {
+        // this->getModeRequest_(message->getType());
+        // break;
     }
     case Type::SENSORS_DATA:
     {

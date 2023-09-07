@@ -13,9 +13,9 @@ int main(){
     std::shared_ptr<SessionCollection> collection = std::make_shared<SessionCollection>();
     std::shared_ptr<DBConnectionPool> pool = std::make_shared<DBConnectionPool>(io);
     pool->open("127.0.0.1", 4000);
-    std::shared_ptr<DBBackend> db = std::make_shared<DBBackend>(pool);
-    std::shared_ptr<EspAuthSystem> esp_a = std::make_shared<EspAuthSystem>(db);
-    std::shared_ptr<ClientAuthSystem> client_a = std::make_shared<ClientAuthSystem>(db);
+    
+    std::shared_ptr<EspAuthSystem> esp_a = std::make_shared<EspAuthSystem>(pool);
+    std::shared_ptr<ClientAuthSystem> client_a = std::make_shared<ClientAuthSystem>(pool);
 
     std::shared_ptr<SessionManager> esp_man = std::make_shared<SessionManager>(collection, io);
     esp_man->setAuth(esp_a);

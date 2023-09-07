@@ -25,7 +25,7 @@ public:
 
     virtual void linkMediator(std::shared_ptr<SessionMediator> mediator) = 0;
     void unlinkMediator();
-    void linkDatabase(std::shared_ptr<DBBackend> db);
+    void linkDatabase(std::shared_ptr<DBAsyncBackend> db);
     
 
     virtual void start(std::shared_ptr<boost::asio::ip::tcp::socket> new_socket, std::shared_ptr<boost::asio::deadline_timer> timer) = 0;

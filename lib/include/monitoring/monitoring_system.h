@@ -41,6 +41,8 @@ public:
     void getNotification(const Notification& notification) override;
     Addressee getName() const override;
 
+    void startMonitoring();
+
 private:
     void getSensorsDataRequest_(const SensorsData& sensors_data);
     void getModeRequest_(const Mode& mode);

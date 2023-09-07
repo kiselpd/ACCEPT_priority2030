@@ -11,7 +11,7 @@ void BaseSession::unlinkMediator(){
     dispatcher_->detachListener(Addressee::Mediator);
 };
 
-void BaseSession::linkDatabase(std::shared_ptr<DBBackend> db){
+void BaseSession::linkDatabase(std::shared_ptr<DBAsyncBackend> db){
     dispatcher_->attachListener(db);
     db->attachDispatcher(dispatcher_);
 };

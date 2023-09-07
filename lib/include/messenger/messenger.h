@@ -4,10 +4,11 @@
 #include "boost/asio.hpp"
 #include "notification_observer.h"
 #include "message.h"
+#include "message_buffer.h"
 #include "additional.h"
 
 const size_t DEFAULT_ESP_WAITING_IN_SECOND = 15;
-const size_t DEFAULT_CLIENT_WAITING_IN_SECOND = 600;//!!!!
+const size_t DEFAULT_CLIENT_WAITING_IN_SECOND = 10;
 
 class BaseMessenger : public NotificationListener
 {
@@ -35,12 +36,14 @@ private:
     void on_start_() override;
     void on_send_(std::shared_ptr<BaseMessage> message) override;
 
-    void on_read_();
+    void on_read_type_();
+    void on_read_struct_();
     void on_wait_();
     void on_process_();
 
     void wait_handler_(const boost::system::error_code& error);
-    void read_handler_(const boost::system::error_code& error, std::size_t bytes_transferred);
+    void read_type_handler_(const boost::system::error_code& error, std::size_t bytes_transferred);
+    void read_struct_handler_(const boost::system::error_code& error, std::size_t bytes_transferred);
     void send_handler_(const boost::system::error_code& error, std::size_t bytes_transferred);
 
     std::shared_ptr<boost::asio::ip::tcp::socket> socket_;
@@ -48,8 +51,7 @@ private:
 
     size_t waiting_in_second_;
 
-    const size_t buffer_size_ = 160; 
-    char buffer_[160]{0};
+    EspMessageBuffer buffer_;
 };
 
 
@@ -77,8 +79,7 @@ private:
     size_t waiting_in_second_;
     std::atomic<bool> is_active_;
 
-    std::vector<char> buffer_;
-    const size_t buffer_size_ = 2048; 
+    ClientMessageBuffer buffer_;
 };
 
 #endif /*MESSENGER_H*/

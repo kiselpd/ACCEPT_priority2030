@@ -1,5 +1,5 @@
-#ifndef REQUEST_H
-#define REQUEST_H
+#ifndef MESSAGE_H
+#define MESSAGE_H
 
 #include <queue>
 #include <variant>
@@ -7,8 +7,10 @@
 #include <cstring>
 #include <mutex>
 #include "additional.h"
+#include <vector>
+#include <iostream>
 
-typedef std::variant<SwitchRelay, Mode, SensorsData, FullSensorsData, StructType> struct_variant;
+typedef std::variant<SwitchRelay, Mode, SensorsData, FullSensorsData, StructType, DBResult> struct_variant;
 
 class BaseMessage
 {
@@ -93,18 +95,16 @@ private:
     FullSensorsData t_struct_;
 };
 
-// class ToDBMessage : public BaseMessage
-// {
-// public:
-//     FullSensorsDataMessage(const FullSensorsData& t_struct);
-//     std::string getJson() const override;
-//     Type getType() const override;
+class FromDBMessage : public BaseMessage
+{
+public:
+    FromDBMessage(const size_t& count, const std::vector<std::vector<std::string>>& result);
+    struct_variant getStruct() const override;
+    Type getType() const override;
 
-//     struct_variant getStruct() const override;
-//     size_t getBufferSize() const override;
+private:
+    size_t count_;
+    std::vector<std::vector<std::string>> result_;
+};
 
-// private:
-//     FullSensorsData t_struct_;
-// };
-
-#endif /*REQUEST_H*/
+#endif /*MESSAGE_H*/

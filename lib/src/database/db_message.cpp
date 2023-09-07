@@ -114,3 +114,30 @@ std::string DBDeleteRequest::createRequest() const{
 
     return str_request;
 };
+
+// DBAnswerBody
+DBAnswerBody::DBAnswerBody(const std::string& answer_body){
+    nlohmann::json json_body = nlohmann::json::parse(answer_body);
+    if(json_body.contains("count"))
+        this->_count = json_body["count"];
+
+    if(json_body.contains("value"))
+        this->_value = json_body["value"].get<std::vector<std::vector<std::string>>>();
+};
+
+std::pair<size_t, DBAnswerBody> parseAnswer(const std::string& answer){
+    nlohmann::json json_body = nlohmann::json::parse(answer);
+    size_t status;
+
+    if(json_body.contains("header"))
+        status = json_body["header"];
+
+    nlohmann::json body;
+
+    if(json_body.contains("body"))
+        body = json_body["body"];
+
+    DBAnswerBody answer_body(body.dump());
+
+    return {status, answer_body};
+}

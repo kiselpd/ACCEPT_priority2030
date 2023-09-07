@@ -99,3 +99,22 @@ Type FullSensorsDataMessage::getType() const {return Type::SENSORS_DATA;};
 struct_variant FullSensorsDataMessage::getStruct() const{return struct_variant(t_struct_);};
 
 size_t FullSensorsDataMessage::getBufferSize() const{return sizeof(StructType) + sizeof(FullSensorsData);};
+
+// class FromDBMessage : public BaseMessage
+// {
+// public:
+//     FromDBMessage(const size_t& count, const std::vector<std::vector<std::string>>& result);
+//     struct_variant getStruct() const override;
+
+// private:
+//     size_t count_;
+//     std::vector<std::vector<std::string>> result_;
+// };
+// FromDBMessage
+FromDBMessage::FromDBMessage(const size_t& count, const std::vector<std::vector<std::string>>& result):
+    count_(count),
+    result_(result){};
+
+struct_variant FromDBMessage::getStruct() const{return struct_variant(DBResult(count_, result_));};
+
+Type FromDBMessage::getType() const {return SUCCESS;};

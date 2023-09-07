@@ -36,6 +36,19 @@ size_t get_mode_from_json(Mode& t_struct, const std::string& json_message){
     }
 };
 
+size_t get_auth_from_json(AuthData& t_struct, const std::string& json_message){
+    try{
+        nlohmann::json message = nlohmann::json::parse(json_message);
+        t_struct.login = message["login"];
+        t_struct.password = message["password"];
+        return EXIT_SUCCESS;
+    }
+    catch(const std::exception& e){
+        std::cerr << e.what() << std::endl << "Switch Auth parsing error!" << std::endl;
+        return EXIT_FAILURE;
+    }
+};
+
 std::string get_data_from_json(const std::string& json_message){
     nlohmann::json message = nlohmann::json::parse(json_message);
     auto data = message[field_name::DATA];

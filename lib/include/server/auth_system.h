@@ -16,22 +16,24 @@ public:
 class EspAuthSystem : public BaseAuthSystem
 {
 public:
-    EspAuthSystem(std::shared_ptr<DBBackend> db);
+    EspAuthSystem(std::shared_ptr<DBConnectionPool> pool);
     std::shared_ptr<BaseSession> authorizeNewSession(std::shared_ptr<boost::asio::ip::tcp::socket> socket) override;
 
 private:
-    std::shared_ptr<DBBackend> db_;
+    std::shared_ptr<DBConnectionPool> pool_;
+    std::shared_ptr<DBSyncBackend> db_;
 };
 
 
 class ClientAuthSystem : public BaseAuthSystem
 {
 public:
-    ClientAuthSystem(std::shared_ptr<DBBackend> db);
+    ClientAuthSystem(std::shared_ptr<DBConnectionPool> pool);
     std::shared_ptr<BaseSession> authorizeNewSession(std::shared_ptr<boost::asio::ip::tcp::socket> socket) override;
 
 private:
-    std::shared_ptr<DBBackend> db_;
+    std::shared_ptr<DBConnectionPool> pool_;
+    std::shared_ptr<DBSyncBackend> db_;
 };
 
 #endif /*AUTH_SYSTEM_H*/
