@@ -7,7 +7,7 @@
 #include "additional.hpp"
 #include "json.hpp"
 
-size_t get_from_json(std::pair<int, std::string> info, const std::string& str_json);
+size_t get_from_json(std::pair<int, std::string>& info, const std::string& str_json);
 
 std::string datagram_to_json(const Datagram& t_struct);
 size_t get_datagram_from_json(Datagram& t_struct, const std::string& str_json);

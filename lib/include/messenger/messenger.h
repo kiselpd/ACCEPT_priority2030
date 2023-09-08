@@ -21,7 +21,7 @@ public:
 
 private:
     virtual void on_start_() = 0;
-    virtual void on_send_(std::shared_ptr<BaseMessage> message) = 0;
+    virtual void on_send_(BaseMessage base_message) = 0;
 
     std::shared_ptr<std::atomic<bool>> is_stopped_;
 };
@@ -34,7 +34,7 @@ public:
 
 private:
     void on_start_() override;
-    void on_send_(std::shared_ptr<BaseMessage> message) override;
+    void on_send_(BaseMessage base_message) override;
 
     void on_read_type_();
     void on_read_struct_();
@@ -62,7 +62,7 @@ public:
 
 private:
     void on_start_() override;
-    void on_send_(std::shared_ptr<BaseMessage> message) override;
+    void on_send_(BaseMessage message) override;
 
     void on_read_();
     void on_wait_();

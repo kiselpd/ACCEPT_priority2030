@@ -1,7 +1,7 @@
 #include "parser.h"
 #include "field_name.h"
 
-size_t get_from_json(std::pair<int, std::string> info, const std::string& str_json){
+size_t get_from_json(std::pair<int, std::string>& info, const std::string& str_json){
     try{
         nlohmann::json json = nlohmann::json::parse(str_json);
         info.first = (int)json[field_name::TYPE];
