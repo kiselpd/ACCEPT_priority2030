@@ -5,7 +5,7 @@
 #include <memory>
 #include <iostream>
 
-#include "additional.h"
+#include "additional.hpp"
 
 const size_t STRUCT_TYPE_SIZE = 8;
 const size_t DEFAULT_CLIENT_BUFFER_SIZE = 2024;
@@ -31,7 +31,7 @@ private:
     std::shared_ptr<char[]> struct_buffer_;
 
     size_t size_;
-    Type type_;
+    EspStructType type_;
 
     const size_t type_buffer_size_ = 8;
 };

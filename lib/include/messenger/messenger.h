@@ -2,10 +2,10 @@
 #define MESSENGER_H
 
 #include "boost/asio.hpp"
+
 #include "notification_observer.h"
-#include "message.h"
+
 #include "message_buffer.h"
-#include "additional.h"
 
 const size_t DEFAULT_ESP_WAITING_IN_SECOND = 15;
 const size_t DEFAULT_CLIENT_WAITING_IN_SECOND = 10;

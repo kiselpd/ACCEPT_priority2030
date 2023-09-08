@@ -1,6 +1,5 @@
 #include "message_buffer.h"
 #include <cstring>
-#include "additional.h"
 
 // EspMessageBuffer
 EspMessageBuffer::EspMessageBuffer() :
@@ -11,11 +10,9 @@ char* EspMessageBuffer::getTypeBuffer(){return type_buffer_.get();};
 char* EspMessageBuffer::getStructBuffer(){return struct_buffer_.get();};
 
 size_t EspMessageBuffer::convertTypeBuffer(){
-    std::shared_ptr<char[]> type_buffer{new char[sizeof(StructType)]};
-    std::memcpy(type_buffer.get(), type_buffer_.get(), sizeof(StructType));
-    StructType* t_struct = reinterpret_cast<StructType*>(type_buffer.get());
-    type_ = (Type)t_struct->type;
-    size_ = t_struct->size;
+    Datagram datagram = get_struct<Datagram>(type_buffer_);
+    type_ = (EspStructType)datagram.type;
+    size_ = datagram.size;
 
     if(size_){
         std::shared_ptr<char[]> tmp_buffer{new char[size_]};

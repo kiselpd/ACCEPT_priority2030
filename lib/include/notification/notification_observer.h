@@ -2,6 +2,7 @@
 #define NOTIFICATION_OBSERVER_H
 
 #include <map>
+
 #include "notification.h"
 
 class NotificationListener;

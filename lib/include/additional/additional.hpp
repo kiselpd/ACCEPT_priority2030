@@ -1,16 +1,15 @@
-#ifndef ADDITIONAL_H
-#define ADDITIONAL_H
+#ifndef ADDITIONAL_HPP
+#define ADDITIONAL_HPP
 
 #include <iostream>
 #include <memory>
 #include <vector>
 
-#define MAX 4
-
 const size_t CONSUMERS_NUMBER = 3;
 
 enum EspStructType
-{
+{   
+    DATAGRAM = -1,
     SUCCESS = 0,
     ERROR,
     AUTH,
@@ -19,8 +18,9 @@ enum EspStructType
     SWITCH_MODE
 };
 
-enum Type
+enum ClientStructType
 {
+    DATAGRAM = -1,
     SUCCESS = 0, //Ответ от сервера на клиента и есп, если авторизация успешна
     ERROR, //Ответ от сервера на клиента и есп, если авторизация не успешна
     AUTH, //Запрос на авторизацию от клиента на сервер и есп на сервер
@@ -34,7 +34,7 @@ enum Type
     SHUTDOWN//Желательно чтобы это отправлял клиент и есп, когда они отключаются
 };
 
-struct StructType // отправляется на есп первой, с типом и размером следующей структуры
+struct Datagram // отправляется на есп первой, с типом и размером следующей структуры
 {
     int type;
     int size; //если type == SUCCESS, ERROR или SENSORS_DATA(на есп) то size = 0
@@ -46,37 +46,29 @@ struct AuthSize //с esp после этой структуры отправля
     int passwordSize;
 };
 
-struct AuthData
+struct Auth
 {
     std::string login;
     std::string password;
 };
 
-struct FullEnergyData
+struct Relay
 {
-    double solar_energy;
-    double wind_energy;
-    double gen_energy;
-    double consumer[CONSUMERS_NUMBER];
-};
-
-struct RelayData
-{
-    double voltage; //В
+    double voltage; //ВAuthSize
     double current; //мА
     bool status;
 };
 
-struct SensorsData // отправляется с есп на сервер
+struct Sensors // отправляется с есп на сервер
 {
-    RelayData solar;
-    RelayData wind;
-    RelayData generator;
+    Relay solar;
+    Relay wind;
+    Relay generator;
     uint16_t battery_voltage;
-    RelayData consumer[CONSUMERS_NUMBER];
+    Relay consumer[CONSUMERS_NUMBER];
 };
 
-struct FullRelayData
+struct FullRelay
 {
     double voltage;
     double current;
@@ -85,28 +77,29 @@ struct FullRelayData
     bool status;
 };
 
-struct FullBatteryData
+struct FullBattery
 {
     double voltage;
     double percentages;
     bool status;
 };
 
-struct FullSensorsData // отправляеpowerтся с сервера на клиент
+struct FullSensors // отправляеpowerтся с сервера на клиент
 {
-    FullRelayData solar;
-    FullRelayData wind;
-    FullRelayData generator;
-    FullBatteryData battery;
-    FullRelayData consumer[CONSUMERS_NUMBER];
+    FullRelay solar;
+    FullRelay wind;
+    FullRelay generator;
+    FullBattery battery;
+    FullRelay consumer[CONSUMERS_NUMBER];
 };
 
-struct ConsumerData
+struct Consumer
 {
-    size_t id;
-    std::string consumer_name;
-    bool status;
+    std::string name;
+    double consumption;
 };
+
+typedef std::vector<std::vector<Consumer>> Consumers;
 
 struct SwitchRelay // отправляется с сервера на есп о переключении реле
 {
@@ -120,7 +113,17 @@ struct Mode // отправляется на есп о режиме работы
     double k; // какой-то коэффициент лучше пусть будет
 };
 
-typedef std::pair<size_t, std::vector<std::vector<std::string>>> DBResult;
+template<typename TStruct>
+TStruct get_struct(std::shared_ptr<char[]>& buffer){
+    TStruct* t_struct = reinterpret_cast<TStruct*>(buffer.get());
+    return *t_struct;
+};
 
+template<typename TStruct>
+std::shared_ptr<char[]> get_buffer(const TStruct& t_struct){
+    std::shared_ptr<char[]> buffer{new char[sizeof(t_struct)]};
+    std::memcpy(buffer.get(), &t_struct, sizeof(t_struct));
+    return buffer;
+};
 
-#endif /*ADDITIONAL_H*/
+#endif /*ADDITIONAL_HPP*/

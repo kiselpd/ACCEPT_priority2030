@@ -1,7 +1,19 @@
 #include "db_message.h"
 
-#include "json.hpp"
 #include <boost/algorithm/string/join.hpp>
+
+// DBBaseMessage
+std::string DBBaseMessage::createRequest() const{
+    return std::string();
+};
+
+size_t DBBaseMessage::getStatus() const{
+    return EXIT_SUCCESS;
+};
+
+std::tuple<size_t, db_value> DBBaseMessage::getAnswer() const{
+    return std::tuple<size_t, db_value>();
+};
 
 // DBSelectRequest
 std::string DBSelectRequest::createRequest() const{
@@ -115,29 +127,37 @@ std::string DBDeleteRequest::createRequest() const{
     return str_request;
 };
 
-// DBAnswerBody
-DBAnswerBody::DBAnswerBody(const std::string& answer_body){
-    nlohmann::json json_body = nlohmann::json::parse(answer_body);
-    if(json_body.contains("count"))
-        this->_count = json_body["count"];
+// DBBaseAnswer
+DBBaseAnswer::DBBaseAnswer(const std::string& str_json){
+    nlohmann::json json = nlohmann::json::parse(str_json);
+    this->setStatus_(json);
 
-    if(json_body.contains("value"))
-        this->_value = json_body["value"].get<std::vector<std::vector<std::string>>>();
+    if(status_ == 200){
+        this->setCount_(json);
+        if(count_)
+            this->setValue_(json);
+    }
 };
 
-std::pair<size_t, DBAnswerBody> parseAnswer(const std::string& answer){
-    nlohmann::json json_body = nlohmann::json::parse(answer);
-    size_t status;
+void DBBaseAnswer::setStatus_(const nlohmann::json& json){
+    if(json.contains("header"))
+        status_ = json["header"];
+};
 
-    if(json_body.contains("header"))
-        status = json_body["header"];
+void DBBaseAnswer::setCount_(const nlohmann::json& json){
+    if(json.contains("count"))
+        count_ = json["count"];
+};
 
-    nlohmann::json body;
+void DBBaseAnswer::setValue_(const nlohmann::json& json){
+    if(json.contains("value"))
+        value_ = json["value"].get<db_value>();
+};
 
-    if(json_body.contains("body"))
-        body = json_body["body"];
+size_t DBBaseAnswer::getStatus() const{
+    return status_;
+};
 
-    DBAnswerBody answer_body(body.dump());
-
-    return {status, answer_body};
-}
+std::tuple<size_t, db_value> DBBaseAnswer::getAnswer() const{
+    return std::tuple<size_t, db_value>(count_, value_);
+};

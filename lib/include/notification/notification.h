@@ -1,10 +1,13 @@
 #ifndef NOTIFICATION_H
 #define NOTIFICATION_H
 
-#include <queue>
 #include <memory>
 #include <mutex>
-#include "message.h"
+#include <variant>
+
+#include "esp_message.h"
+#include "client_message.h"
+#include "db_message.h"
 
 enum Addressee
 {
@@ -14,20 +17,28 @@ enum Addressee
     Messenger
 };
 
+typedef std::variant<std::shared_ptr<EspBaseMessage>, std::shared_ptr<ClientBaseMessage>, std::shared_ptr<DBBaseMessage>> BaseMessage;
+
+enum BaseMessageIndex
+{
+    Esp = 0,
+    Client,
+    DB
+};
 
 class Notification
 {
 public:
-    Notification() {};   
-    Notification(const Addressee& addressee, std::shared_ptr<BaseMessage> message);
+    Notification();   
+    Notification(const Addressee& addressee, BaseMessage message);
     
-    void set(const Addressee& addressee, std::shared_ptr<BaseMessage> message);
+    void set(const Addressee& addressee, BaseMessage message);
     Addressee getAddressee() const;
-    std::shared_ptr<BaseMessage> getMessage() const;
+    BaseMessage getMessage() const;
 
 private:
     Addressee addressee_;
-    std::shared_ptr<BaseMessage> message_;
+    BaseMessage message_;
 };
 
 #endif /*NOTIFICATION_H*/

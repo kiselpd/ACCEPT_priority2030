@@ -28,9 +28,8 @@ namespace field_name //Поля для заполнения json
 
     namespace consumer //Данные о потребителях
     {
-        const std::string ID = "id";
         const std::string NAME = "name";
-        const std::string STATUS = "status";
+        const std::string CONSUMPTION = "consumption";
     }
 
     namespace switch_relay //Переключение реле

@@ -3,17 +3,26 @@
 
 #include <iostream>
 #include <vector>
+#include <tuple>
 
-class DBBaseRequest
+#include "json.hpp"
+
+typedef std::vector<std::vector<std::string>> db_value;
+
+class DBBaseMessage
 {
 public:
-    virtual std::string createRequest() const = 0;
+    virtual ~DBBaseMessage() = default;
+    
+    virtual std::string createRequest() const;
+    virtual size_t getStatus() const;
+    virtual std::tuple<size_t, db_value> getAnswer() const;
 };
 
-class DBSelectRequest : public DBBaseRequest
+class DBSelectRequest : public DBBaseMessage
 {
 public:
-    std::string createRequest() const override;
+    std::string createRequest() const;
 
     std::string _source;
     std::vector<std::string> _target;
@@ -21,47 +30,54 @@ public:
     size_t _limit = 0;
 };
 
-class DBInsertRequest : public DBBaseRequest
+class DBInsertRequest : public DBBaseMessage
 {
 public:
     std::string _source;
     std::vector<std::string> _target;
     std::vector<std::vector<std::string>> _value;
 
-    std::string createRequest() const override;
+    std::string createRequest() const;
 };
 
 
-class DBUpdateRequest : public DBBaseRequest
+class DBUpdateRequest : public DBBaseMessage
 {
 public:
     std::string _source;
     std::vector<std::string> _target;
     std::string _option;
 
-    std::string createRequest() const override;
+    std::string createRequest() const;
 };
 
 
-class DBDeleteRequest : public DBBaseRequest
+class DBDeleteRequest : public DBBaseMessage
 {
 public:
     std::string _source;
     std::string _option;
 
-    std::string createRequest() const override;
+    std::string createRequest() const;
 };
 
 
-class DBAnswerBody
+class DBBaseAnswer : public DBBaseMessage
 {
 public:
-    DBAnswerBody(const std::string& answer_body);
+    DBBaseAnswer(const std::string& str_json);
 
-    size_t _count;
-    std::vector<std::vector<std::string>> _value;
+    size_t getStatus() const;
+    std::tuple<size_t, db_value> getAnswer() const;
+
+private:
+    void setStatus_(const nlohmann::json& json);
+    void setCount_(const nlohmann::json& json);
+    void setValue_(const nlohmann::json& json);
+
+    size_t status_;
+    size_t count_;
+    db_value value_;
 };
-
-std::pair<size_t, DBAnswerBody> parseAnswer(const std::string& answer);
 
 #endif /*DB_MESSAGE_H*/
