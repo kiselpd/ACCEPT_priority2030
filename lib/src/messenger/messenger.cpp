@@ -63,7 +63,7 @@ void EspMessenger::on_wait_(){
 };
 
 void EspMessenger::on_send_(BaseMessage base_message){
-    if(base_message.index() == BaseMessageIndex::Esp){
+    if(base_message.index() == User::Esp){
         std::shared_ptr<EspBaseMessage> esp_base_message = std::get<std::shared_ptr<EspBaseMessage>>(base_message);
         auto buffer = esp_base_message->getBuffer();
         auto send_handler = [this](const boost::system::error_code& error, std::size_t bytes_transferred) {
@@ -79,35 +79,20 @@ void EspMessenger::on_send_(BaseMessage base_message){
 };
 
 void EspMessenger::on_process_(){
+    std::shared_ptr<EspBaseMessage> esp_base_message;
     switch (buffer_.getType())
     {
-    case Type::SENSORS_DATA:
-    {
-        std::shared_ptr<char[]> struct_buffer{new char[sizeof(SensorsData)]};
-        std::memcpy(struct_buffer.get(), buffer_.getStructBuffer(), sizeof(SensorsData));
-        SensorsData* t_struct = reinterpret_cast<SensorsData*>(struct_buffer.get());
-        this->notifyDispatcher(Notification{Addressee::Monitoring_System, std::make_shared<SensorsDataMessage>(*t_struct)});
+    case StructType::SENSORS_DATA:
+        esp_base_message = std::make_shared<EspSensorsMessage>();
         break;
-    }
-    case Type::SUCCESS:
-    {
-        std::shared_ptr<char[]> struct_buffer{new char[sizeof(StructType)]};
-        std::memcpy(struct_buffer.get(), buffer_.getStructBuffer(), sizeof(StructType));
-        StructType* t_struct = reinterpret_cast<StructType*>(struct_buffer.get());
-        this->notifyDispatcher(Notification{Addressee::Monitoring_System, std::make_shared<TypeMessage>((Type)t_struct->type)});
+    case StructType::MODE:
+        esp_base_message = std::make_shared<EspModeMessage>();
         break;
-    }
-    case Type::ERROR:
-    {
-        std::shared_ptr<char[]> struct_buffer{new char[sizeof(StructType)]};
-        std::memcpy(struct_buffer.get(), buffer_.getStructBuffer(), sizeof(StructType));
-        StructType* t_struct = reinterpret_cast<StructType*>(struct_buffer.get());
-        this->notifyDispatcher(Notification{Addressee::Monitoring_System, std::make_shared<TypeMessage>((Type)t_struct->type)});
-        break;
-    }
     default:
-        break;
+        return;
     }
+    esp_base_message->setBuffer(buffer_.getStructSharedBuffer());
+    this->notifyDispatcher(Notification{Addressee::Monitoring_System, BaseMessage(esp_base_message)});
 };
 
 void EspMessenger::wait_handler_(const boost::system::error_code& error){
@@ -169,7 +154,7 @@ void ClientMessenger::on_start_(){
 };
 
 void ClientMessenger::on_send_(BaseMessage base_message){
-    if(base_message.index() == BaseMessageIndex::Client){
+    if(base_message.index() == User::Client){
         std::shared_ptr<ClientBaseMessage> client_base_message = std::get<std::shared_ptr<ClientBaseMessage>>(base_message);
         auto send_handler = [this](const boost::system::error_code& error, std::size_t bytes_transferred) {
             this->send_handler_(error, bytes_transferred);
@@ -205,42 +190,36 @@ void ClientMessenger::on_wait_(){
 void ClientMessenger::on_process_(){
     std::pair<int, std::string> info;
     auto error = get_from_json(info, buffer_.getString());
-    // std::cout << buffer_.getString() << std::endl;
     if(!error){
-        BaseMessage base_message;
+        std::shared_ptr<ClientBaseMessage> client_base_message;
 
         switch (info.first)
         {
-        case ClientStructType::SWITCH_RELAY:
-        {
-            std::shared_ptr<ClientBaseMessage> client_base_message = std::make_shared<ClientSwitchRelayMessage>();
-            client_base_message->setJson(info.second);
-            
+        case StructType::SWITCH_RELAY:
+            client_base_message = std::make_shared<ClientSwitchRelayMessage>();            
             break;
-        }
-        case ClientStructType::MODE:
-            client_base_message = std::make_shared<ClientModeMessage>();
+        case StructType::MODE:
+            client_base_message = std::make_shared<ClientModeMessage>();  
             break;
-
-        case ClientStructType::SHUTDOWN:
+        case StructType::SHUTDOWN:
             timer_->cancel();
             socket_->cancel();
             this->stop();
             return;
 
-        case ClientStructType::PING:
+        case StructType::PING:
             this->on_ping_();
             return;
         default:
             break;
         }
         client_base_message->setJson(info.second);
-        this->notifyDispatcher(Notification{Addressee::Monitoring_System, BaseMessage(client_base_message)});
+        this->notifyDispatcher(Notification{Addressee::Mediator, BaseMessage(client_base_message)});
     }
 };
 
 void ClientMessenger::on_ping_(){
-    std::shared_ptr<ClientBaseMessage> client_base_message = std::make_shared<ClientDatagramMessage>(Datagram{ClientStructType::PING, 0});
+    std::shared_ptr<ClientBaseMessage> client_base_message = std::make_shared<ClientDatagramMessage>(Datagram{StructType::PING, 0});
     this->on_send_(BaseMessage(client_base_message));
 };
 

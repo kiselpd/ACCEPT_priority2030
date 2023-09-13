@@ -8,12 +8,12 @@
 
 #include "notification_observer.h"
 
-const size_t DEFAULT_CLIENT_BUFFER_SIZE = 2048;
+const size_t DEFAULT_DB_BUFFER_SIZE = 2048;
 
 class DBMessageBuffer
 {
 public:
-    DBMessageBuffer(const size_t& buffer_size = DEFAULT_CLIENT_BUFFER_SIZE);
+    DBMessageBuffer(const size_t& buffer_size = DEFAULT_DB_BUFFER_SIZE);
 
     std::vector<char>& get();
 

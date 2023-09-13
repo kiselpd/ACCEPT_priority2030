@@ -5,7 +5,7 @@ size_t get_from_json(std::pair<int, std::string>& info, const std::string& str_j
     try{
         nlohmann::json json = nlohmann::json::parse(str_json);
         info.first = (int)json[field_name::TYPE];
-        info.second = (std::string)json[field_name::DATA];
+        info.second = json[field_name::DATA].dump();
         return EXIT_SUCCESS;
     }
     catch(const std::exception& e){
@@ -47,7 +47,7 @@ std::string auth_to_json(const Auth& t_struct){
     std::string str_json;
     try{
         nlohmann::json json;
-        json[field_name::TYPE] = (int)ClientStructType::AUTH;
+        json[field_name::TYPE] = (int)StructType::AUTH;
 
         nlohmann::json json_data;
         json_data[field_name::auth::LOGIN] = t_struct.login;
@@ -82,7 +82,7 @@ std::string full_sensors_to_json(const FullSensors& t_struct){
     std::string str_json;
     try{
         nlohmann::json json;
-        json[field_name::TYPE] = (int)ClientStructType::SENSORS_DATA;
+        json[field_name::TYPE] = (int)StructType::SENSORS_DATA;
 
         nlohmann::json json_data;
 
@@ -135,7 +135,7 @@ std::string mode_to_json(const Mode& t_struct){
     std::string str_json;
     try{
         nlohmann::json json;
-        json[field_name::TYPE] = (int)ClientStructType::MODE;
+        json[field_name::TYPE] = (int)StructType::MODE;
 
         nlohmann::json json_data;
         json_data[field_name::mode::MODE] = t_struct.mode;
@@ -184,7 +184,7 @@ std::string consumers_to_json(const Consumers& t_struct){
     std::string str_json;
     try{
         nlohmann::json json;
-        json[field_name::TYPE] = (int)ClientStructType::CONSUMERS_DATA;
+        json[field_name::TYPE] = (int)StructType::CONSUMERS_DATA;
 
         nlohmann::json json_data;
         for (size_t i = 0; i < t_struct.size(); i++){

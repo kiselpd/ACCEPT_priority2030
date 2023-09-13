@@ -19,13 +19,6 @@ enum Addressee
 
 typedef std::variant<std::shared_ptr<EspBaseMessage>, std::shared_ptr<ClientBaseMessage>, std::shared_ptr<DBBaseMessage>> BaseMessage;
 
-enum BaseMessageIndex
-{
-    Esp = 0,
-    Client,
-    DB
-};
-
 class Notification
 {
 public:

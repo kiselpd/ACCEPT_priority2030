@@ -33,9 +33,9 @@ EspSession::EspSession(const int& id) : BaseSession(id){
     ms->attachDispatcher(dispatcher_);
 };
 
-SessionOwner EspSession::getOwner() const {return SessionOwner::Esp;};
+User EspSession::getOwner() const {return User::Esp;};
 
-SessionOwner EspSession::getFriend() const {return SessionOwner::Client;};
+User EspSession::getFriend() const {return User::Client;};
 
 void EspSession::linkMediator(std::shared_ptr<SessionMediator> mediator){
     std::shared_ptr<EspColleague> colleague = std::make_shared<EspColleague>(mediator);
@@ -58,9 +58,9 @@ ClientSession::ClientSession(const int& id) : BaseSession(id){
     // dispatcher_->attachListener(monitor);
 };
 
-SessionOwner ClientSession::getOwner() const {return SessionOwner::Client;};
+User ClientSession::getOwner() const {return User::Client;};
 
-SessionOwner ClientSession::getFriend() const {return SessionOwner::Esp;};
+User ClientSession::getFriend() const {return User::Esp;};
 
 void ClientSession::linkMediator(std::shared_ptr<SessionMediator> mediator){
     std::shared_ptr<ClientColleague> colleague = std::make_shared<ClientColleague>(mediator);

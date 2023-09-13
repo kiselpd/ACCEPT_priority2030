@@ -16,12 +16,11 @@ public:
     EspMessageBuffer();
 
     char* getTypeBuffer();
-    char* getStructBuffer();
-
-    size_t getTypeBuffer() const;
-    size_t getStructBuffer() const;
 
     size_t convertTypeBuffer();
+
+    char* getStructBuffer();
+    std::shared_ptr<char[]> getStructSharedBuffer();
 
     size_t getType() const;
     size_t getSize() const;
@@ -31,9 +30,9 @@ private:
     std::shared_ptr<char[]> struct_buffer_;
 
     size_t size_;
-    EspStructType type_;
+    StructType type_;
 
-    const size_t type_buffer_size_ = 8;
+    const size_t type_buffer_size_ = STRUCT_TYPE_SIZE;
 };
 
 

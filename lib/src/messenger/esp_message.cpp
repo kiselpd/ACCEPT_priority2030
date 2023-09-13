@@ -14,15 +14,15 @@ esp_struct EspDatagramMessage::getStruct() const{
     return esp_struct(t_struct_);
 };
 
-EspStructType EspDatagramMessage::getType() const{
-    return EspStructType::DATAGRAM;
+StructType EspDatagramMessage::getType() const{
+    return StructType::DATAGRAM;
 };
 
 size_t EspDatagramMessage::getSize() const{
     return sizeof(Datagram);
 };
 
-void EspDatagramMessage::setBuffer(std::shared_ptr<char[]>& buffer){
+void EspDatagramMessage::setBuffer(std::shared_ptr<char[]> buffer){
     t_struct_ = get_struct<Datagram>(buffer);
 };
 
@@ -40,15 +40,15 @@ esp_struct EspAuthMessage::getStruct() const{
     return esp_struct(t_struct_);
 };
 
-EspStructType EspAuthMessage::getType() const{
-    return EspStructType::AUTH;
+StructType EspAuthMessage::getType() const{
+    return StructType::AUTH;
 };
 
 size_t EspAuthMessage::getSize() const{
     return sizeof(AuthSize);
 };
 
-void EspAuthMessage::setBuffer(std::shared_ptr<char[]>& buffer){
+void EspAuthMessage::setBuffer(std::shared_ptr<char[]> buffer){
     t_struct_ = get_struct<AuthSize>(buffer);
 };
 
@@ -66,15 +66,15 @@ esp_struct EspSensorsMessage::getStruct() const{
     return esp_struct(t_struct_);
 };
 
-EspStructType EspSensorsMessage::getType() const{
-    return EspStructType::SENSORS_DATA;
+StructType EspSensorsMessage::getType() const{
+    return StructType::SENSORS_DATA;
 };
 
 size_t EspSensorsMessage::getSize() const{
     return sizeof(Sensors);
 };
 
-void EspSensorsMessage::setBuffer(std::shared_ptr<char[]>& buffer){
+void EspSensorsMessage::setBuffer(std::shared_ptr<char[]> buffer){
     t_struct_ = get_struct<Sensors>(buffer);
 };
 
@@ -92,15 +92,15 @@ esp_struct EspModeMessage::getStruct() const{
     return esp_struct(t_struct_);
 };
 
-EspStructType EspModeMessage::getType() const{
-    return EspStructType::SWITCH_MODE;
+StructType EspModeMessage::getType() const{
+    return StructType::MODE;
 };
 
 size_t EspModeMessage::getSize() const{
     return sizeof(Mode);
 };
 
-void EspModeMessage::setBuffer(std::shared_ptr<char[]>& buffer){
+void EspModeMessage::setBuffer(std::shared_ptr<char[]> buffer){
     t_struct_ = get_struct<Mode>(buffer);
 };
 
@@ -118,14 +118,14 @@ esp_struct EspSwitchRelayMessage::getStruct() const{
     return esp_struct(t_struct_);
 };
 
-EspStructType EspSwitchRelayMessage::getType() const{
-    return EspStructType::SWITCH_MODE;
+StructType EspSwitchRelayMessage::getType() const{
+    return StructType::MODE;
 };
 
 size_t EspSwitchRelayMessage::getSize() const{
     return sizeof(SwitchRelay);
 };
 
-void EspSwitchRelayMessage::setBuffer(std::shared_ptr<char[]>& buffer){
+void EspSwitchRelayMessage::setBuffer(std::shared_ptr<char[]> buffer){
     t_struct_ = get_struct<SwitchRelay>(buffer);
 };

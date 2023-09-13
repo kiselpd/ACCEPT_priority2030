@@ -15,8 +15,8 @@ client_struct ClientDatagramMessage::getStruct() const{
     return client_struct(t_struct_);
 };
 
-ClientStructType ClientDatagramMessage::getType() const{
-    return ClientStructType::DATAGRAM;
+StructType ClientDatagramMessage::getType() const{
+    return StructType::DATAGRAM;
 };
 
 size_t ClientDatagramMessage::setJson(const std::string& json){
@@ -37,8 +37,8 @@ client_struct ClientAuthMessage::getStruct() const{
     return client_struct(t_struct_);
 };
 
-ClientStructType ClientAuthMessage::getType() const{
-    return ClientStructType::AUTH;
+StructType ClientAuthMessage::getType() const{
+    return StructType::AUTH;
 };
 
 size_t ClientAuthMessage::setJson(const std::string& json){
@@ -59,8 +59,8 @@ client_struct ClientSensorsMessage::getStruct() const{
     return client_struct(t_struct_);
 };
 
-ClientStructType ClientSensorsMessage::getType() const{
-    return ClientStructType::SENSORS_DATA;
+StructType ClientSensorsMessage::getType() const{
+    return StructType::SENSORS_DATA;
 };
 
 size_t ClientSensorsMessage::setJson(const std::string& json){
@@ -81,8 +81,8 @@ client_struct ClientModeMessage::getStruct() const{
     return client_struct(t_struct_);
 };
 
-ClientStructType ClientModeMessage::getType() const{
-    return ClientStructType::MODE;
+StructType ClientModeMessage::getType() const{
+    return StructType::MODE;
 };
 
 size_t ClientModeMessage::setJson(const std::string& json){
@@ -103,8 +103,8 @@ client_struct ClientSwitchRelayMessage::getStruct() const{
     return client_struct(t_struct_);
 };
 
-ClientStructType ClientSwitchRelayMessage::getType() const{
-    return ClientStructType::SWITCH_RELAY;
+StructType ClientSwitchRelayMessage::getType() const{
+    return StructType::SWITCH_RELAY;
 };
 
 size_t ClientSwitchRelayMessage::setJson(const std::string& json){
@@ -125,8 +125,8 @@ client_struct ClientConsumersMessage::getStruct() const{
     return client_struct(t_struct_);
 };
 
-ClientStructType ClientConsumersMessage::getType() const{
-    return ClientStructType::CONSUMERS_DATA;
+StructType ClientConsumersMessage::getType() const{
+    return StructType::CONSUMERS_DATA;
 };
 
 size_t ClientConsumersMessage::setJson(const std::string& json){

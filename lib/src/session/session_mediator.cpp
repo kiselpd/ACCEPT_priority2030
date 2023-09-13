@@ -2,54 +2,36 @@
 
 // SessionMediator
 SessionMediator::~SessionMediator(){
-    this->unregisterColleague(ColleagueName::EsP);
-    this->unregisterColleague(ColleagueName::ClienT);
+    this->unregisterColleague(User::Esp);
+    this->unregisterColleague(User::Client);
 
     std::cout << "mediator destructor" << std::endl;
 };
 
 void SessionMediator::registerColleague(std::shared_ptr<BaseColleague> colleague){
-    if(colleague->getColleagueName() == ColleagueName::EsP)
+    if(colleague->getColleagueName() == User::Esp)
         this->esp_ = colleague;
-    if(colleague->getColleagueName() == ColleagueName::ClienT)
+    if(colleague->getColleagueName() == User::Client)
         this->client_ = colleague;
 };
 
-void SessionMediator::unregisterColleague(ColleagueName colleague_type){
-    if(colleague_type == ColleagueName::EsP)
+void SessionMediator::unregisterColleague(const User& colleague_type){
+    if(colleague_type == User::Esp)
         this->esp_.reset();
-    if(colleague_type == ColleagueName::ClienT)
+    if(colleague_type == User::Client)
         this->client_.reset();
 };
 
-void SessionMediator::send(const Notification& notification, ColleagueName colleague_type){
+void SessionMediator::send(const Notification& notification, const User& colleague_type){
     auto shared_esp = esp_.lock();
     auto shared_client = client_.lock();
-    if((colleague_type == ColleagueName::EsP) && shared_esp)
+    if((colleague_type == User::Esp) && shared_esp)
             shared_esp->recive(notification);
-    if((colleague_type == ColleagueName::ClienT) && shared_client)
+    if((colleague_type == User::Client) && shared_client)
         shared_client->recive(notification);
 };
 
 // BaseColleague
-void BaseColleague::getNotification(const Notification& notification){
-    std::cout << "i am here 2" << std::endl;
-    if(this->getColleagueName() == ColleagueName::EsP){
-        std::cout << "i am here 3" << std::endl;
-        this->send(Notification{Addressee::Messenger, notification.getMessage()});
-    }
-    else{
-        std::cout << "i am here 4" << std::endl;
-        auto message = notification.getMessage();
-        if(message->getType() == Type::SWITCH_RELAY){
-            std::cout << "i am here 5" << std::endl;
-            this->send(Notification{Addressee::Messenger, notification.getMessage()});
-        }
-        if(message->getType() == Type::MODE)
-            this->send(Notification{Addressee::Monitoring_System, notification.getMessage()});
-    }
-};
-
 Addressee BaseColleague::getName() const{
     return Addressee::Mediator;
 };
@@ -57,8 +39,12 @@ Addressee BaseColleague::getName() const{
 // EspColleague
 EspColleague::EspColleague(std::shared_ptr<SessionMediator>  mediator) : mediator_(mediator) {};
 
+void EspColleague::getNotification(const Notification& notification){
+    this->send(Notification{Addressee::Messenger, notification.getMessage()});
+};
+
 void EspColleague::send(const Notification& notification){
-    mediator_->send(notification, ColleagueName::ClienT);
+    mediator_->send(notification, User::Client);
 };
 
 void EspColleague::recive(const Notification& notification){
@@ -66,22 +52,26 @@ void EspColleague::recive(const Notification& notification){
     this->notifyDispatcher(notification);
 };
 
-ColleagueName EspColleague::getColleagueName() const{
-    return ColleagueName::EsP;
+User EspColleague::getColleagueName() const{
+    return User::Esp;
 };
 
 // ClientColleague
 ClientColleague::ClientColleague(std::shared_ptr<SessionMediator>  mediator) : mediator_(mediator) {};
 
+void ClientColleague::getNotification(const Notification& notification){
+    this->send(Notification{Addressee::Monitoring_System, notification.getMessage()});
+};
+
 void ClientColleague::send(const Notification& notification){
     std::cout << "i am here 6" << std::endl;
-    mediator_->send(notification, ColleagueName::EsP);
+    mediator_->send(notification, User::Esp);
 };
 
 void ClientColleague::recive(const Notification& notification){
     this->notifyDispatcher(notification);
 };
 
-ColleagueName ClientColleague::getColleagueName() const{
-    return ColleagueName::ClienT;
+User ClientColleague::getColleagueName() const{
+    return User::Client;
 };

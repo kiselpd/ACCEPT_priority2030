@@ -24,7 +24,7 @@ DBAsyncBackend::DBAsyncBackend(std::shared_ptr<DBConnectionPool> pool) : pool_(p
 
 void DBAsyncBackend::getNotification(const Notification& notification){
     auto base_message = notification.getMessage();
-    if(base_message.index() == BaseMessageIndex::DB){
+    if(base_message.index() == User::DB){
         std::shared_ptr<DBBaseMessage> base_db_message = std::get<std::shared_ptr<DBBaseMessage>>(base_message);
         this->doRequest(base_db_message);
     }

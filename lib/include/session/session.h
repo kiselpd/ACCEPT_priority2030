@@ -9,19 +9,13 @@
 
 #include "db_backend.h"
 
-enum SessionOwner
-{
-    Esp,
-    Client
-};
-
 class BaseSession : public std::enable_shared_from_this<BaseSession>
 {
 public:
     BaseSession(const int& id);
 
-    virtual SessionOwner getOwner() const = 0;
-    virtual SessionOwner getFriend() const = 0;
+    virtual User getOwner() const = 0;
+    virtual User getFriend() const = 0;
 
     virtual void linkMediator(std::shared_ptr<SessionMediator> mediator) = 0;
     void unlinkMediator();
@@ -53,8 +47,8 @@ public:
 
     void start(std::shared_ptr<boost::asio::ip::tcp::socket> new_socket, std::shared_ptr<boost::asio::deadline_timer> timer) override;
 
-    SessionOwner getOwner() const override;
-    SessionOwner getFriend() const override;
+    User getOwner() const override;
+    User getFriend() const override;
 };
 
 
@@ -68,8 +62,8 @@ public:
 
     void start(std::shared_ptr<boost::asio::ip::tcp::socket> new_socket, std::shared_ptr<boost::asio::deadline_timer> timer) override;
 
-    SessionOwner getOwner() const override;
-    SessionOwner getFriend() const override;
+    User getOwner() const override;
+    User getFriend() const override;
 };
 
 #endif /*SESSION_H*/

@@ -1,112 +1,92 @@
 #include "monitoring_system.h"
-#include "message.h"
-#include "parser.h"
+#include <memory>
 
-#include <sstream>
+// EspStrategy
+EspStrategy::EspStrategy(std::shared_ptr<SensorsCondition> sensors_condition, std::shared_ptr<ModeCondition> mode_condition) :
+    sensors_condition_(sensors_condition),
+    mode_condition_(mode_condition){};
 
-// ModeCondition
-Mode ModeCondition::getMode() const{return mode_;};
 
-void ModeCondition::updateCondition(const Mode& mode, const FullSensorsData& full_sensors_data){
-    mode_ = mode;
-};
-
-// SensorsDataCondition
-FullSensorsData SensorsDataCondition::getFullSensorsData() const{return sensors_data_;};
-
-void SensorsDataCondition::updateCondition(const SensorsData& sensors_data){
-    this->sensors_data_ = this->calculateFullSensorsData_(sensors_data);
-    // power_data_.solar_energy += sensors_data_.solar.power;
-
-    // this->updateDatabaseInfo_();
-};
-
-void SensorsDataCondition::updateDatabaseInfo_(){
-
-};
-
-FullSensorsData SensorsDataCondition::calculateFullSensorsData_(const SensorsData& sensors_data){
-    FullSensorsData full_sensors_data;
-
-    full_sensors_data.solar = this->calculateFullSensorData_(sensors_data.solar);
-    full_sensors_data.wind = this->calculateFullSensorData_(sensors_data.wind);
-    full_sensors_data.generator = this->calculateFullSensorData_(sensors_data.generator);
-    full_sensors_data.battery = this->calculateFullBatteryData_(sensors_data);
-
-    for (size_t i = 0; i < CONSUMERS_NUMBER; i++)
-        full_sensors_data.consumer[i] = this->calculateFullSensorData_(sensors_data.consumer[i]);
+Notification EspStrategy::process(const BaseMessage& base_message){
+    std::shared_ptr<EspBaseMessage> message_from_esp = std::get<std::shared_ptr<EspBaseMessage>>(base_message);
+    std::shared_ptr<ClientBaseMessage> message_to_client;
     
-    return full_sensors_data;
+    switch(message_from_esp->getType())
+    {
+    case StructType::SENSORS_DATA:
+        sensors_condition_->updateCondition(std::get<Sensors>(message_from_esp->getStruct()));
+        message_to_client = std::make_shared<ClientSensorsMessage>(sensors_condition_->getTmpCondition());
+        break;
+    case StructType::MODE:
+        mode_condition_->updateModeCondition((std::get<Mode>(message_from_esp->getStruct())).mode);
+        message_to_client = std::make_shared<ClientModeMessage>(mode_condition_->getCondition());
+        break;
+    default:
+        break;
+    }
+    
+    return Notification(Addressee::Mediator, BaseMessage(message_to_client));
 };
 
-FullBatteryData SensorsDataCondition::calculateFullBatteryData_(const SensorsData& sensors_data) const{
-    FullBatteryData bat;
-    std::cout << sensors_data.battery_voltage << std::endl;
-    double tmp_voltage = sensors_data.battery_voltage * 3.3 * 5.3 / 4096;
-    bat.voltage = tmp_voltage + (0.00028*(1+0.0001*(tmp_voltage - 12.5))*(sensors_data.consumer[0].current / 1000 + sensors_data.consumer[1].current / 1000 + sensors_data.consumer[2].current / 1000 - sensors_data.solar.current / 2000 - sensors_data.wind.current / 2000 - sensors_data.generator.current * 4000));
-    bat.percentages = (bat.voltage / 13.5) * 100;
-    bat.status = ((sensors_data.solar.current + sensors_data.wind.current + sensors_data.generator.current) - (sensors_data.consumer[0].current + sensors_data.consumer[1].current + sensors_data.consumer[2].current) > 0) ? (1) : (0);
+// ClientStrategy
+ClientStrategy::ClientStrategy(std::shared_ptr<ModeCondition> mode_condition) :
+    mode_condition_(mode_condition){};
 
-    return bat;
+
+Notification ClientStrategy::process(const BaseMessage& base_message){
+    std::shared_ptr<ClientBaseMessage> message_from_client = std::get<std::shared_ptr<ClientBaseMessage>>(base_message);
+    std::shared_ptr<EspBaseMessage> message_to_esp;
+
+    switch(message_from_client->getType())
+    {
+    case StructType::SWITCH_RELAY:
+        message_to_esp = std::make_shared<EspSwitchRelayMessage>(std::get<SwitchRelay>(message_from_client->getStruct()));
+        break;
+    case StructType::MODE:
+        mode_condition_->updateModeCondition((std::get<Mode>(message_from_client->getStruct())).mode);
+        message_to_esp = std::make_shared<EspModeMessage>(mode_condition_->getCondition());
+        break;
+    default:
+        break;
+    }
+    
+    return Notification(Addressee::Mediator, BaseMessage(message_to_esp));
 };
 
-FullRelayData SensorsDataCondition::calculateFullSensorData_(const RelayData& sensor_data) const{
-    FullRelayData full_sensor_data;
+// DBStrategy
+DBStrategy::DBStrategy(std::shared_ptr<ModeCondition> mode_condition) :
+    mode_condition_(mode_condition){};
 
-    full_sensor_data.current = sensor_data.current;
-    full_sensor_data.voltage = sensor_data.voltage;
-    full_sensor_data.status = sensor_data.status;
-    full_sensor_data.power = sensor_data.current * sensor_data.voltage;
-    full_sensor_data.percentages = 32.12; //пока так
-
-    return full_sensor_data;
+Notification DBStrategy::process(const BaseMessage& base_message){
+    std::shared_ptr<DBBaseMessage> message_from_db = std::get<std::shared_ptr<DBBaseMessage>>(base_message);
+    if(message_from_db->getStatus() == 200){
+        
+    }
+    return Notification();
 };
 
 // MonitoringSystem
 void MonitoringSystem::getNotification(const Notification& notification){
-    auto message = notification.getMessage();
-
-    switch (message->getType())
+    std::unique_ptr<BaseStrategy> strategy;
+    auto base_message = notification.getMessage();
+    switch (base_message.index())
     {
-    case Type::MODE:
-    {
-        auto t_struct = std::get<Mode>(message->getStruct());
-        this->getModeRequest_(t_struct);
+    case User::Esp:
+        strategy = std::make_unique<EspStrategy>(sensors_condition_, mode_condition_);
         break;
-    }
-    case Type::SUCCESS:
-    {
-        // this->getModeRequest_(message->getType());
-        // break;
-    }
-    case Type::ERROR:
-    {
-        // this->getModeRequest_(message->getType());
-        // break;
-    }
-    case Type::SENSORS_DATA:
-    {
-        auto t_struct = std::get<SensorsData>(message->getStruct());
-        this->getSensorsDataRequest_(t_struct);
+    case User::Client:
+        strategy = std::make_unique<ClientStrategy>(mode_condition_);
         break;
-    }
+    case User::DB:
+        strategy = std::make_unique<DBStrategy>(mode_condition_);
+        break;
     default:
-        break;
+        return;
     }
+    auto new_notification = strategy->process(base_message);
+    // this->notifyDispatcher(new_notification); do async
 };
 
-Addressee MonitoringSystem::getName() const{return Addressee::Monitoring_System;};
-
-
-void MonitoringSystem::getSensorsDataRequest_(const SensorsData& sensors_data){
-    this->sensors_data_condition_.updateCondition(sensors_data);
-    std::shared_ptr<BaseMessage> message = std::make_shared<FullSensorsDataMessage>(this->sensors_data_condition_.getFullSensorsData());
-    this->notifyDispatcher(Notification(Addressee::Mediator, message));
-};
-
-
-void MonitoringSystem::getModeRequest_(const Mode& mode){
-    this->mode_condition_.updateCondition(mode, this->sensors_data_condition_.getFullSensorsData());
-    std::shared_ptr<BaseMessage> message = std::make_shared<SwitchModeMessage>(this->mode_condition_.getMode());
-    this->notifyDispatcher(Notification(Addressee::Messenger, message));
+Addressee MonitoringSystem::getName() const{
+    return Addressee::Monitoring_System;
 };

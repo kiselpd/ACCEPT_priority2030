@@ -4,21 +4,18 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <cstring>
 
 const size_t CONSUMERS_NUMBER = 3;
 
-enum EspStructType
-{   
-    DATAGRAM = -1,
-    SUCCESS = 0,
-    ERROR,
-    AUTH,
-    SENSORS_DATA,
-    SWITCH_RELAY = 5,
-    SWITCH_MODE
+enum User
+{
+    Esp = 0,
+    Client,
+    DB
 };
 
-enum ClientStructType
+enum StructType
 {
     DATAGRAM = -1,
     SUCCESS = 0, //Ответ от сервера на клиента и есп, если авторизация успешна
@@ -91,6 +88,20 @@ struct FullSensors // отправляеpowerтся с сервера на кл�
     FullRelay generator;
     FullBattery battery;
     FullRelay consumer[CONSUMERS_NUMBER];
+};
+
+struct FullPower
+{
+    FullPower() :
+        solar(0), wind(0), generator(0), consumer{0} {};
+
+    double solar;
+    double wind;
+    double generator;
+    double consumer[CONSUMERS_NUMBER];
+
+    friend FullPower operator+=(FullPower& power, const FullSensors& sensors);
+    friend FullPower operator/(const FullPower& power, const size_t& k);
 };
 
 struct Consumer

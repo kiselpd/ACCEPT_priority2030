@@ -1,10 +1,14 @@
 #ifndef SESSION_COLLECTION_H
 #define SESSION_COLLECTION_H
 
-#include "session.h"
 #include <vector>
 #include <mutex>
 #include <memory>
+
+#include "additional.hpp"
+
+#include "session.h"
+
 
 class SessionCollection
 {
@@ -14,7 +18,7 @@ public:
     void removeSession(std::vector<std::shared_ptr<BaseSession>> :: iterator session_it);
 
     std::vector<std::shared_ptr<BaseSession>>::iterator findSession(std::shared_ptr<BaseSession> session);
-    std::vector<std::shared_ptr<BaseSession>>::iterator findSession(const int& id, const SessionOwner& owner);
+    std::vector<std::shared_ptr<BaseSession>>::iterator findSession(const int& id, const User& owner);
 
     void erasePassiveSession();
 

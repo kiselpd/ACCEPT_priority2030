@@ -9,9 +9,11 @@ char* EspMessageBuffer::getTypeBuffer(){return type_buffer_.get();};
 
 char* EspMessageBuffer::getStructBuffer(){return struct_buffer_.get();};
 
+std::shared_ptr<char[]> EspMessageBuffer::getStructSharedBuffer(){return struct_buffer_;};
+
 size_t EspMessageBuffer::convertTypeBuffer(){
     Datagram datagram = get_struct<Datagram>(type_buffer_);
-    type_ = (EspStructType)datagram.type;
+    type_ = (StructType)datagram.type;
     size_ = datagram.size;
 
     if(size_){

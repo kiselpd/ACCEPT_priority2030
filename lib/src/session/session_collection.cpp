@@ -21,7 +21,7 @@ std::vector<std::shared_ptr<BaseSession>>::iterator SessionCollection::findSessi
     return std::find(collection_->begin(), collection_->end(), session);
 };
 
-std::vector<std::shared_ptr<BaseSession>>::iterator SessionCollection::findSession(const int& id, const SessionOwner& owner){
+std::vector<std::shared_ptr<BaseSession>>::iterator SessionCollection::findSession(const int& id, const User& owner){
     auto lambda = [id, owner](const std::shared_ptr<BaseSession>& session){
         return (session->getId() == id) && (session->getOwner() == owner);};
 

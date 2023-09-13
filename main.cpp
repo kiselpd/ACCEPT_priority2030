@@ -22,10 +22,10 @@ int main(){
     std::shared_ptr<SessionManager> client_man = std::make_shared<SessionManager>(collection, io);
     client_man->setAuth(client_a);
     
-    std::shared_ptr<Acceptor> esp_acc = std::make_shared<Acceptor>(io, 2001);
+    std::shared_ptr<Acceptor> esp_acc = std::make_shared<Acceptor>(io, DEFAULT_ESP_ACCEPTOR_PORT);
     esp_acc->start(esp_man);
 
-    std::shared_ptr<Acceptor> client_acc = std::make_shared<Acceptor>(io, 3000);
+    std::shared_ptr<Acceptor> client_acc = std::make_shared<Acceptor>(io, DEFAULT_CLIENT_ACCEPTOR_PORT);
     client_acc->start(client_man);
 
     std::thread th(&SessionManager::startCheckSession, client_man);

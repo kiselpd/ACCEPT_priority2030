@@ -13,7 +13,7 @@ public:
 
     virtual std::string getJson() const = 0;
     virtual client_struct getStruct() const = 0;
-    virtual ClientStructType getType() const = 0;
+    virtual StructType getType() const = 0;
 
     virtual size_t setJson(const std::string& json) = 0;
 };
@@ -27,7 +27,7 @@ public:
 
     std::string getJson() const override;
     client_struct getStruct() const override;
-    ClientStructType getType() const override;
+    StructType getType() const override;
 
     size_t setJson(const std::string& json) override;
 
@@ -44,7 +44,7 @@ public:
 
     std::string getJson() const override;
     client_struct getStruct() const override;
-    ClientStructType getType() const override;
+    StructType getType() const override;
 
     size_t setJson(const std::string& json) override;
 
@@ -61,7 +61,7 @@ public:
 
     std::string getJson() const override;
     client_struct getStruct() const override;
-    ClientStructType getType() const override;
+    StructType getType() const override;
 
     size_t setJson(const std::string& json) override;
 
@@ -78,7 +78,7 @@ public:
 
     std::string getJson() const override;
     client_struct getStruct() const override;
-    ClientStructType getType() const override;
+    StructType getType() const override;
 
     size_t setJson(const std::string& json) override;
 
@@ -95,7 +95,7 @@ public:
 
     std::string getJson() const override;
     client_struct getStruct() const override;
-    ClientStructType getType() const override;
+    StructType getType() const override;
 
     size_t setJson(const std::string& json) override;
 
@@ -112,7 +112,7 @@ public:
 
     std::string getJson() const override;
     client_struct getStruct() const override;
-    ClientStructType getType() const override;
+    StructType getType() const override;
 
     size_t setJson(const std::string& json) override;
 
