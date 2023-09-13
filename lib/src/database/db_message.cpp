@@ -11,8 +11,8 @@ size_t DBBaseMessage::getStatus() const{
     return EXIT_SUCCESS;
 };
 
-std::tuple<size_t, db_value> DBBaseMessage::getAnswer() const{
-    return std::tuple<size_t, db_value>();
+std::pair<size_t, db_value> DBBaseMessage::getAnswer() const{
+    return std::pair<size_t, db_value>();
 };
 
 // DBSelectRequest
@@ -133,31 +133,37 @@ DBBaseAnswer::DBBaseAnswer(const std::string& str_json){
     this->setStatus_(json);
 
     if(status_ == 200){
-        this->setCount_(json);
+        this->setCount_(json["body"]);
         if(count_)
-            this->setValue_(json);
+            this->setValue_(json["body"]);
     }
 };
 
 void DBBaseAnswer::setStatus_(const nlohmann::json& json){
-    if(json.contains("header"))
+    if(json.contains("header")){
         status_ = json["header"];
+        std::cout << "db status: " << status_ << std::endl;
+    }
 };
 
 void DBBaseAnswer::setCount_(const nlohmann::json& json){
-    if(json.contains("count"))
+    if(json.contains("count")){
         count_ = json["count"];
+        std::cout << "db size: " << count_ << std::endl;
+    }
 };
 
 void DBBaseAnswer::setValue_(const nlohmann::json& json){
-    if(json.contains("value"))
+    if(json.contains("value")){
         value_ = json["value"].get<db_value>();
+        std::cout << value_.size() << " " << value_[0].size() << std::endl;
+    }
 };
 
 size_t DBBaseAnswer::getStatus() const{
     return status_;
 };
 
-std::tuple<size_t, db_value> DBBaseAnswer::getAnswer() const{
-    return std::tuple<size_t, db_value>(count_, value_);
+std::pair<size_t, db_value> DBBaseAnswer::getAnswer() const{
+    return std::pair<size_t, db_value>(count_, value_);
 };

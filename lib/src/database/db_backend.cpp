@@ -72,8 +72,8 @@ void DBAsyncBackend::send_handler_(const boost::system::error_code& error, std::
 void DBAsyncBackend::read_handler_(const boost::system::error_code& error, std::size_t bytes_transferred){
     if(!error && bytes_transferred){
         pool_->setFreeConnection(std::move(booked_connection_));
-        std::cout << "Free conn " << booked_connection_ << std::endl; 
-        std::shared_ptr<DBBaseAnswer> answer = std::make_shared<DBBaseAnswer>(buffer_.getString());
+        std::shared_ptr<DBBaseMessage> answer = std::make_shared<DBBaseAnswer>(buffer_.getString());
+        std::cout << buffer_.getString() << std::endl;
         this->notifyDispatcher(Notification{Addressee::Monitoring_System, BaseMessage(answer)});
     }
     else

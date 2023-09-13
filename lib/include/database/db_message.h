@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <vector>
-#include <tuple>
 
 #include "json.hpp"
 
@@ -16,7 +15,7 @@ public:
     
     virtual std::string createRequest() const;
     virtual size_t getStatus() const;
-    virtual std::tuple<size_t, db_value> getAnswer() const;
+    virtual std::pair<size_t, db_value> getAnswer() const;
 };
 
 class DBSelectRequest : public DBBaseMessage
@@ -68,7 +67,7 @@ public:
     DBBaseAnswer(const std::string& str_json);
 
     size_t getStatus() const;
-    std::tuple<size_t, db_value> getAnswer() const;
+    std::pair<size_t, db_value> getAnswer() const;
 
 private:
     void setStatus_(const nlohmann::json& json);

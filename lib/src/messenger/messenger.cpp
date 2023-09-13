@@ -13,7 +13,6 @@ void BaseMessenger::stop(){
 
 void BaseMessenger::getNotification(const Notification& notification){
     auto base_message = notification.getMessage();
-    std::cout << "on send" << std::endl;
     this->on_send_(base_message);
 };
 
@@ -70,9 +69,8 @@ void EspMessenger::on_send_(BaseMessage base_message){
             this->send_handler_(error, bytes_transferred);
         };
 
-        std::cout << "send to esp" << std::endl;
         socket_->async_write_some(
-            boost::asio::buffer(buffer.get(), esp_base_message->getSize()),
+            boost::asio::buffer(buffer.get(), sizeof(Datagram) + esp_base_message->getSize()),
             send_handler
         );
     }
@@ -104,7 +102,6 @@ void EspMessenger::wait_handler_(const boost::system::error_code& error){
 
 void EspMessenger::read_type_handler_(const boost::system::error_code& error, std::size_t bytes_transferred){
     timer_->cancel();
-    std::cout << "bytes trans" << bytes_transferred << std::endl;
     if(!error && bytes_transferred){
         if(buffer_.convertTypeBuffer()){
             this->on_wait_();
@@ -123,7 +120,6 @@ void EspMessenger::read_type_handler_(const boost::system::error_code& error, st
 
 void EspMessenger::read_struct_handler_(const boost::system::error_code& error, std::size_t bytes_transferred){
     timer_->cancel();
-    std::cout << "bytes trans" << bytes_transferred << std::endl;
     if(!error && bytes_transferred){
         this->on_process_();
         this->on_start_();

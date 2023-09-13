@@ -32,6 +32,11 @@ public:
     std::shared_ptr<BaseSession> authorizeNewSession(std::shared_ptr<boost::asio::ip::tcp::socket> socket) override;
 
 private:
+    size_t reciveRequest_(std::shared_ptr<boost::asio::ip::tcp::socket> socket, std::shared_ptr<ClientBaseMessage>& message);
+    std::shared_ptr<DBSelectRequest> createRequestToDB_(const Auth& auth_struct);
+
+    size_t writeAnswer_(std::shared_ptr<boost::asio::ip::tcp::socket> socket, const StructType& type);
+
     std::shared_ptr<DBConnectionPool> pool_;
     std::shared_ptr<DBSyncBackend> db_;
 };

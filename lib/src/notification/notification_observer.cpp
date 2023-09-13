@@ -18,7 +18,6 @@ void NotificationDispatcher::detachListener(const Addressee& listener){
 
 void NotificationDispatcher::notifyListener(const Notification& notification){
     if(this->listeners_.count(notification.getAddressee())){
-        std::cout << "i am here" << std::endl;
         auto listener = this->listeners_.at(notification.getAddressee());
         listener->getNotification(notification);
     }
@@ -37,8 +36,6 @@ void NotificationListener::detachDispatcher(){
 
 void NotificationListener::notifyDispatcher(const Notification& notification){
     auto lock_dispatcher = dispatcher_.lock();
-    if(lock_dispatcher){
-        std::cout << "I am here 1" <<std::endl;
+    if(lock_dispatcher)
         lock_dispatcher->notifyListener(notification);
-    }
 };

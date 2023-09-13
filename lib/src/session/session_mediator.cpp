@@ -4,8 +4,6 @@
 SessionMediator::~SessionMediator(){
     this->unregisterColleague(User::Esp);
     this->unregisterColleague(User::Client);
-
-    std::cout << "mediator destructor" << std::endl;
 };
 
 void SessionMediator::registerColleague(std::shared_ptr<BaseColleague> colleague){
@@ -48,7 +46,6 @@ void EspColleague::send(const Notification& notification){
 };
 
 void EspColleague::recive(const Notification& notification){
-    std::cout << "I am here 7" << std::endl;
     this->notifyDispatcher(notification);
 };
 
@@ -64,7 +61,6 @@ void ClientColleague::getNotification(const Notification& notification){
 };
 
 void ClientColleague::send(const Notification& notification){
-    std::cout << "i am here 6" << std::endl;
     mediator_->send(notification, User::Esp);
 };
 

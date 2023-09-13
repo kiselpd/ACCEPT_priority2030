@@ -49,6 +49,10 @@ public:
 
     User getOwner() const override;
     User getFriend() const override;
+
+private:
+    void on_preparation_();
+    void on_energy_();
 };
 
 
@@ -64,6 +68,12 @@ public:
 
     User getOwner() const override;
     User getFriend() const override;
+
+private:
+    void on_preparation_();
+
+    void on_consumers_();
+    void on_energy_();
 };
 
 #endif /*SESSION_H*/

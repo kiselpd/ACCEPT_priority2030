@@ -1,6 +1,9 @@
 #include "session.h"
 #include "monitoring_system.h"
 
+#include "boost/format.hpp"
+#include "boost/date_time.hpp"
+
 // BaseSession
 BaseSession::BaseSession(const int& id) :
     id_(id),
@@ -28,7 +31,7 @@ int BaseSession::getId() const{return id_;};
 
 // EspSession
 EspSession::EspSession(const int& id) : BaseSession(id){
-    auto ms = std::make_shared<MonitoringSystem>();
+    auto ms = std::make_shared<EspMonitoringSystem>();
     dispatcher_->attachListener(ms);
     ms->attachDispatcher(dispatcher_);
 };
@@ -40,7 +43,6 @@ User EspSession::getFriend() const {return User::Client;};
 void EspSession::linkMediator(std::shared_ptr<SessionMediator> mediator){
     std::shared_ptr<EspColleague> colleague = std::make_shared<EspColleague>(mediator);
     mediator->registerColleague(colleague);
-    std::cout << "esp mediator: " << mediator.get() << std::endl;
     dispatcher_->attachListener(colleague);
     colleague->attachDispatcher(dispatcher_);
 };
@@ -50,12 +52,31 @@ void EspSession::start(std::shared_ptr<boost::asio::ip::tcp::socket> new_socket,
     messenger->start(is_stopped_);
     dispatcher_->attachListener(messenger);
     messenger->attachDispatcher(dispatcher_);
+    on_preparation_();
+};
+
+void EspSession::on_preparation_(){
+    on_energy_();
+};
+
+void EspSession::on_energy_(){
+    std::shared_ptr<DBSelectRequest> request = std::make_shared<DBSelectRequest>();
+    request->_source = "predicted_power";
+
+    boost::gregorian::date today = boost::gregorian::day_clock::local_day();
+    
+    auto option = boost::format(
+        "user_id = '%1%' AND date_stamp ='%2%' AND date_period='%3%'") % this->getId() % today % 6;
+    request->_option = option.str();
+
+    dispatcher_->notifyListener(Notification(Addressee::Database, BaseMessage(request)));
 };
 
 // ClientSession
 ClientSession::ClientSession(const int& id) : BaseSession(id){
-    // std::shared_ptr<MonitoringSystem> monitor = std::make_shared<MonitoringSystem>();
-    // dispatcher_->attachListener(monitor);
+    auto ms = std::make_shared<ClientMonitiringSystem>();
+    dispatcher_->attachListener(ms);
+    ms->attachDispatcher(dispatcher_);
 };
 
 User ClientSession::getOwner() const {return User::Client;};
@@ -65,7 +86,6 @@ User ClientSession::getFriend() const {return User::Esp;};
 void ClientSession::linkMediator(std::shared_ptr<SessionMediator> mediator){
     std::shared_ptr<ClientColleague> colleague = std::make_shared<ClientColleague>(mediator);
     mediator->registerColleague(colleague);
-    std::cout << "client mediator: " << mediator.get() << std::endl;
     dispatcher_->attachListener(colleague);
     colleague->attachDispatcher(dispatcher_);
 };
@@ -75,4 +95,24 @@ void ClientSession::start(std::shared_ptr<boost::asio::ip::tcp::socket> new_sock
     messenger->start(is_stopped_);
     dispatcher_->attachListener(messenger);
     messenger->attachDispatcher(dispatcher_);
+    on_preparation_();
+};
+
+void ClientSession::on_preparation_(){
+    on_consumers_();
+    on_energy_();
+};
+
+void ClientSession::on_consumers_(){
+    std::shared_ptr<DBSelectRequest> request = std::make_shared<DBSelectRequest>();
+    request->_source = "consumer";
+    auto option = boost::format(
+        "user_id = '%1%'") % this->getId();
+    request->_option = option.str();
+
+    dispatcher_->notifyListener(Notification(Addressee::Database, BaseMessage(request)));
+};
+
+void ClientSession::on_energy_(){
+
 };

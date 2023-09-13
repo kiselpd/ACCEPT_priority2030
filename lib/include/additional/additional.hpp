@@ -121,7 +121,7 @@ struct SwitchRelay // отправляется с сервера на есп о 
 struct Mode // отправляется на есп о режиме работы
 {
     int mode;
-    double k; // какой-то коэффициент лучше пусть будет
+    int k; // какой-то коэффициент лучше пусть будет
 };
 
 template<typename TStruct>
@@ -134,6 +134,15 @@ template<typename TStruct>
 std::shared_ptr<char[]> get_buffer(const TStruct& t_struct){
     std::shared_ptr<char[]> buffer{new char[sizeof(t_struct)]};
     std::memcpy(buffer.get(), &t_struct, sizeof(t_struct));
+    return buffer;
+};
+
+template<typename TStruct>
+std::shared_ptr<char[]> get_buffer(const StructType& type, const TStruct& t_struct){
+    Datagram type_struct{type, sizeof(t_struct)};
+    std::shared_ptr<char[]> buffer{new char[sizeof(Datagram) + sizeof(t_struct)]};
+    std::memcpy(buffer.get(), &type_struct, sizeof(type_struct));
+    std::memcpy(buffer.get() + sizeof(Datagram), &t_struct, sizeof(t_struct));
     return buffer;
 };
 

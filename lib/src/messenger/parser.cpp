@@ -156,7 +156,7 @@ size_t get_mode_from_json(Mode& t_struct, const std::string& str_json){
     try{
         nlohmann::json json = nlohmann::json::parse(str_json);
         t_struct.mode = (int)json[field_name::mode::MODE];
-        t_struct.k = (double)json[field_name::mode::K];
+        // t_struct.k = (double)json[field_name::mode::K];
         return EXIT_SUCCESS;
     }
     catch(const std::exception& e){

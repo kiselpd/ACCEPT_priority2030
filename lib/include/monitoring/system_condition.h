@@ -27,7 +27,7 @@ class ModeCondition
 {
 public:
     void updateModeCondition(const int& mode_condition);
-    void updatePredictedDataCondition(const double& predicted_data_condition);
+    void updatePredictedDataCondition(const int& predicted_data_condition);
     Mode getCondition() const;
     
 private:
