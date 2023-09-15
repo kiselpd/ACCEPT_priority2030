@@ -66,7 +66,7 @@ void EspSession::on_energy_(){
     boost::gregorian::date today = boost::gregorian::day_clock::local_day();
     
     auto option = boost::format(
-        "user_id = '%1%' AND date_stamp ='%2%' AND date_period='%3%'") % this->getId() % today % 6;
+        "user_id = '%1%' AND date_stamp ='%2%' AND date_period='%3%'") % this->getId() % today % 3;
     request->_option = option.str();
 
     dispatcher_->notifyListener(Notification(Addressee::Database, BaseMessage(request)));

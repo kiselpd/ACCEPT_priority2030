@@ -44,6 +44,7 @@ Notification ClientStrategyFromEsp::process(const BaseMessage& base_message){
     case StructType::MODE:
         mode_condition_->updateModeCondition((std::get<Mode>(message_from_client->getStruct())).mode);
         message_to_esp = std::make_shared<EspModeMessage>(mode_condition_->getCondition());
+        std::cout << mode_condition_->getCondition().k << "HEREERERRE" << std::endl;
         break;
     default:
         break;
