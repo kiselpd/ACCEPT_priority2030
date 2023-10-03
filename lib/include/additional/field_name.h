@@ -43,6 +43,12 @@ namespace field_name //Поля для заполнения json
         const std::string MODE = "mode";
         const std::string K = "k";
     }
+
+    namespace graph
+    {
+        const std::string PREDICTION = "prediction";
+        const std::string REALITY = "reality";
+    }
 }
 
 #endif /*FIELD_NAME*/

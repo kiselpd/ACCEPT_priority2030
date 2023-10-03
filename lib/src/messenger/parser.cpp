@@ -207,3 +207,51 @@ std::string consumers_to_json(const Consumers& t_struct){
     }
     return str_json;
 };
+
+std::string graphs_to_json(const PredictedPowers& predicted_struct, const ActualPowers& actual_struct){
+    std::string str_json;
+    try
+    {
+        nlohmann::json json;
+        json[field_name::TYPE] = (int)StructType::DAY_POWER_DATA;
+
+        nlohmann::json json_data;
+
+        nlohmann::json prediction = nlohmann::json::array();
+        for(const auto& elem: predicted_struct){
+            auto elem_array = nlohmann::json::array(
+            {(std::string)elem.date,
+            (double)elem.generated_power,
+            (double)elem.consumption_power});
+
+            prediction.push_back(elem_array);
+        }
+
+        nlohmann::json reality = nlohmann::json::array();
+        for(const auto& elem: actual_struct){
+            auto elem_array = nlohmann::json::array(
+            {(std::string)elem.date,
+            (double)elem.solar,
+            (double)elem.wind,
+            (double)elem.generator,
+            (double)elem.consumer[0],
+            (double)elem.consumer[1],
+            (double)elem.consumer[2]});
+
+            reality.push_back(elem_array);
+        }
+
+        json_data[field_name::graph::PREDICTION] = prediction;
+        json_data[field_name::graph::REALITY] = reality;
+
+        json[field_name::DATA] = json_data;
+
+        str_json = json.dump();
+    }
+    catch(const std::exception& e)
+    {
+        std::cout << "Graphs to json error!" << std::endl;
+        std::cerr << e.what() << '\n';
+    }
+    
+};

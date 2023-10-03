@@ -124,6 +124,26 @@ struct Mode // отправляется на есп о режиме работы
     int k; // какой-то коэффициент лучше пусть будет
 };
 
+struct PredictedPower
+{
+    std::string date;
+    double generated_power;
+    double consumption_power;
+};
+
+typedef std::vector<PredictedPower> PredictedPowers;
+
+struct ActualPower
+{
+    std::string date;
+    double solar;
+    double wind;
+    double generator;
+    double consumer[CONSUMERS_NUMBER];
+};
+
+typedef std::vector<ActualPower> ActualPowers;
+
 template<typename TStruct>
 TStruct get_struct(std::shared_ptr<char[]>& buffer){
     TStruct* t_struct = reinterpret_cast<TStruct*>(buffer.get());

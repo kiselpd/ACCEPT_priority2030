@@ -4,7 +4,7 @@
 #include "additional.hpp"
 #include <variant>
 
-typedef std::variant<Datagram, Auth, FullSensors, Mode, SwitchRelay, Consumers> client_struct;
+typedef std::variant<Datagram, Auth, FullSensors, Mode, SwitchRelay, Consumers, std::pair<PredictedPowers, ActualPowers>> client_struct;
 
 class ClientBaseMessage
 {
@@ -118,6 +118,23 @@ public:
 
 private:
     Consumers t_struct_;
+};
+
+
+class ClientGraphsMessage : public ClientBaseMessage{
+public:
+    ClientGraphsMessage();
+    ClientGraphsMessage(const PredictedPowers& predicted_struct, const ActualPowers& actual_struct);
+
+    std::string getJson() const override;
+    client_struct getStruct() const override;
+    StructType getType() const override;
+
+    size_t setJson(const std::string& json) override;
+
+private:
+    PredictedPowers predicted_struct_;
+    ActualPowers actual_struct_;
 };
 
 #endif /*CLIENT_MESSAGE_H*/
