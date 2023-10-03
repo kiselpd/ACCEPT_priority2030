@@ -104,13 +104,7 @@ struct FullPower
     friend FullPower operator/(const FullPower& power, const size_t& k);
 };
 
-struct Consumer
-{
-    std::string name;
-    double consumption;
-};
-
-typedef std::vector<std::vector<Consumer>> Consumers;
+typedef std::vector<std::vector<std::string>> Consumers;
 
 struct SwitchRelay // отправляется с сервера на есп о переключении реле
 {

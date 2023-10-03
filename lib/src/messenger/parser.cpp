@@ -191,8 +191,7 @@ std::string consumers_to_json(const Consumers& t_struct){
             nlohmann::json group = nlohmann::json::array();
             for(const auto& elem : t_struct[i]){
                 nlohmann::json consumer;
-                consumer[field_name::consumer::NAME] = elem.name;
-                consumer[field_name::consumer::CONSUMPTION] = elem.consumption;
+                consumer[field_name::consumer::NAME] = elem;
                 group.push_back(consumer);
             }
             json_data["G" + std::to_string(i + 1)] = group;
