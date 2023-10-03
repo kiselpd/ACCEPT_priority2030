@@ -15,45 +15,35 @@ public:
 };
 
 
-class EspStrategyFromEsp : public BaseStrategy
+class StrategyMessageFromEsp : public BaseStrategy
 {
 public:
-    EspStrategyFromEsp(std::shared_ptr<SensorsCondition> sensors_condition, std::shared_ptr<ModeCondition> mode_condition);
+    StrategyMessageFromEsp(std::shared_ptr<SensorsCondition> sensors_condition);
     Notification process(const BaseMessage& base_message) final;
 
 private:
     std::shared_ptr<SensorsCondition> sensors_condition_;
-    std::shared_ptr<ModeCondition> mode_condition_;
 };
 
 
-class ClientStrategyFromEsp : public BaseStrategy
+class StrategyMessageFromClient : public BaseStrategy
 {
 public:
-    ClientStrategyFromEsp(std::shared_ptr<ModeCondition> mode_condition);
-    Notification process(const BaseMessage& base_message) final;
-
-private:
-    std::shared_ptr<SensorsCondition> sensors_condition_;
-    std::shared_ptr<ModeCondition> mode_condition_;
-};
-
-
-class DBStrategyFromEsp : public BaseStrategy
-{
-public:
-    DBStrategyFromEsp(std::shared_ptr<ModeCondition> mode_condition);
+    StrategyMessageFromClient(std::shared_ptr<ModeCondition> mode_condition);
     Notification process(const BaseMessage& base_message) final;
 
 private:
     std::shared_ptr<ModeCondition> mode_condition_;
 };
 
-
-class DBStrategyFromClient : public BaseStrategy
+class StrategyMessageFromDB : public BaseStrategy
 {
 public:
+    StrategyMessageFromDB(std::shared_ptr<ModeCondition> mode_condition);
     Notification process(const BaseMessage& base_message) final;
+
+private:
+    std::shared_ptr<ModeCondition> mode_condition_;
 };
 
 #endif /*MONITORING_STRATEGY_H*/

@@ -11,7 +11,11 @@ public:
     void getNotification(const Notification& notification) final;
     Addressee getName() const final;
 
+    void getPreparatoryData();
+
 private:
+    std::shared_ptr<DBSelectRequest> createRequestToDB();
+    
     std::shared_ptr<SensorsCondition> sensors_condition_;
     std::shared_ptr<ModeCondition> mode_condition_;
 };

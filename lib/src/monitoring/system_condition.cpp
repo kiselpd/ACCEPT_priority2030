@@ -67,7 +67,7 @@ void ModeCondition::updateModeCondition(const int& mode_condition){
     tmp_mode_condition_.mode = mode_condition;
 };
 
-void ModeCondition::updatePredictedDataCondition(const int& predicted_data_condition){
+void ModeCondition::updatePredictedDataCondition(const double& predicted_data_condition){
     tmp_mode_condition_.k = predicted_data_condition;
     std::cout << "K= " << tmp_mode_condition_.k << std::endl;
 };
