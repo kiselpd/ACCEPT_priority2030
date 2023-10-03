@@ -24,35 +24,10 @@ private:
     std::vector<char> buffer_;
 };
 
-
-class DBAsyncBackend : public NotificationListener
+class DBBackend
 {
 public:
-    DBAsyncBackend(std::shared_ptr<DBConnectionPool> pool);
-
-    void getNotification(const Notification& notification) override;
-    Addressee getName() const override;
-    
-    void doRequest(std::shared_ptr<DBBaseMessage> request);
-    
-private:
-    void on_send_(const std::string& str_request);
-    void on_read_();
-
-    void send_handler_(const boost::system::error_code& error, std::size_t bytes_transferred);
-    void read_handler_(const boost::system::error_code& error, std::size_t bytes_transferred);
-
-    DBMessageBuffer buffer_;
-    
-    std::shared_ptr<DBConnection> booked_connection_;
-    std::shared_ptr<DBConnectionPool> pool_;
-};
-
-
-class DBSyncBackend
-{
-public:
-    DBSyncBackend(std::shared_ptr<DBConnectionPool> pool);
+    DBBackend(std::shared_ptr<DBConnectionPool> pool);
     
     size_t doRequest(std::shared_ptr<DBBaseMessage> request, std::shared_ptr<DBBaseAnswer>& answer);
     
