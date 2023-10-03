@@ -24,7 +24,9 @@ std::string DBSelectRequest::createRequest() const{
         nlohmann::json header;
         nlohmann::json body;
 
-        header["type"] = "GET";
+        header["method"] = "GET";
+        header["token"] = _token;
+        
         body["source"] = _source;
 
         if(!_target.empty())
@@ -54,7 +56,9 @@ std::string DBInsertRequest::createRequest() const{
         nlohmann::json header;
         nlohmann::json body;
 
-        header["type"] = "PUT";
+        header["method"] = "PUT";
+        header["token"] = _token;
+
         body["source"] = _source;
 
         if(!_target.empty())
@@ -85,7 +89,9 @@ std::string DBUpdateRequest::createRequest() const{
         nlohmann::json header;
         nlohmann::json body;
 
-        header["type"] = "POST";
+        header["method"] = "POST";
+        header["token"] = _token;
+
         body["source"] = _source;
 
         if(!_target.empty())
@@ -112,7 +118,9 @@ std::string DBDeleteRequest::createRequest() const{
         nlohmann::json header;
         nlohmann::json body;
 
-        header["type"] = "DELETE";
+        header["method"] = "DELETE";
+        header["token"] = _token;
+
         body["source"] = _source;
 
         if(!_option.empty())
@@ -127,6 +135,33 @@ std::string DBDeleteRequest::createRequest() const{
     return str_request;
 };
 
+// class DBAuthRequest : public DBBaseMessage
+// {
+// public:
+//     std::string _login;
+//     std::string _password;
+
+//     std::string createRequest() const;
+// };
+// DBAuthRequest
+std::string DBAuthRequest::createRequest() const{
+    std::string str_request;
+
+    if(!(_login.empty() || _password.empty())){
+        nlohmann::json request;
+        nlohmann::json header;
+        nlohmann::json body;
+
+        header["method"] = "POST";
+
+        body["username"] = _login;
+        body["password"] = _password;
+
+        str_request = request.dump();
+    }
+
+    return str_request;
+};
 // DBBaseAnswer
 DBBaseAnswer::DBBaseAnswer(const std::string& str_json){
     nlohmann::json json = nlohmann::json::parse(str_json);

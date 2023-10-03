@@ -25,11 +25,9 @@ void SessionManager::createSession(std::shared_ptr<boost::asio::ip::tcp::socket>
             if(friend_session_it != collection_->end()){
                 std::shared_ptr<SessionMediator> mediator = std::make_shared<SessionMediator>();
                 new_session->linkMediator(mediator);
-                (*friend_session_it)->unlinkMediator();
                 (*friend_session_it)->linkMediator(mediator);
             }
-
-            new_session->start(new_socket, std::make_shared<boost::asio::deadline_timer>(*io_service_));
+            auth_->start(new_session, new_socket, io_service_);
         }
     }
 };

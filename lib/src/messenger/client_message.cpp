@@ -167,6 +167,11 @@ client_struct ClientGraphsMessage::getStruct() const
     return client_struct(std::make_pair(predicted_struct_, actual_struct_));
 };
 
+StructType ClientGraphsMessage::getType() const
+{
+    return StructType::DAY_POWER_DATA;
+};
+
 size_t ClientGraphsMessage::setJson(const std::string& json) {
     return EXIT_FAILURE;
 };

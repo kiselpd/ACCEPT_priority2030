@@ -23,6 +23,7 @@ class DBSelectRequest : public DBBaseMessage
 public:
     std::string createRequest() const;
 
+    std::string _token;
     std::string _source;
     std::vector<std::string> _target;
     std::string _option;
@@ -32,6 +33,7 @@ public:
 class DBInsertRequest : public DBBaseMessage
 {
 public:
+    std::string _token;
     std::string _source;
     std::vector<std::string> _target;
     std::vector<std::vector<std::string>> _value;
@@ -43,6 +45,7 @@ public:
 class DBUpdateRequest : public DBBaseMessage
 {
 public:
+    std::string _token;
     std::string _source;
     std::vector<std::string> _target;
     std::string _option;
@@ -54,8 +57,18 @@ public:
 class DBDeleteRequest : public DBBaseMessage
 {
 public:
+    std::string _token;
     std::string _source;
     std::string _option;
+
+    std::string createRequest() const;
+};
+
+class DBAuthRequest : public DBBaseMessage
+{
+public:
+    std::string _login;
+    std::string _password;
 
     std::string createRequest() const;
 };

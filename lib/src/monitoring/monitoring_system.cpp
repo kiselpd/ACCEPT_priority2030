@@ -5,8 +5,9 @@
 #include "boost/format.hpp"
 
 // EspMonitoringSystem
-EspMonitoringSystem::EspMonitoringSystem() : sensors_condition_(std::make_shared<SensorsCondition>()),
-                                             mode_condition_(std::make_shared<ModeCondition>()){};
+EspMonitoringSystem::EspMonitoringSystem(const std::string &token) : sensors_condition_(std::make_shared<SensorsCondition>()),
+                                                                     mode_condition_(std::make_shared<ModeCondition>()),
+                                                                     token_(token){};
 
 void EspMonitoringSystem::getNotification(const Notification &notification)
 {
@@ -46,6 +47,7 @@ void EspMonitoringSystem::getPreparatoryData()
 std::shared_ptr<DBSelectRequest> EspMonitoringSystem::createRequestToDB_()
 {
     std::shared_ptr<DBSelectRequest> request = std::make_shared<DBSelectRequest>();
+    request->_token = token_;
     request->_source = "predicted_power_info";
 
     boost::gregorian::date today = boost::gregorian::day_clock::local_day();
@@ -57,6 +59,8 @@ std::shared_ptr<DBSelectRequest> EspMonitoringSystem::createRequestToDB_()
 };
 
 // ClientMonitiringSystem
+ClientMonitiringSystem::ClientMonitiringSystem(const std::string &token) : token_(token){};
+
 void ClientMonitiringSystem::getNotification(const Notification &notification)
 {
     std::shared_ptr<DBBaseMessage> message_from_db = std::get<std::shared_ptr<DBBaseMessage>>(notification.getMessage());
@@ -97,6 +101,7 @@ void ClientMonitiringSystem::getPreparatoryData()
 std::shared_ptr<DBSelectRequest> ClientMonitiringSystem::createPredictedRequestToDB_()
 {
     std::shared_ptr<DBSelectRequest> request = std::make_shared<DBSelectRequest>();
+    request->_token = token_;
     request->_source = "predicted_power_info";
     boost::gregorian::date today = boost::gregorian::day_clock::local_day();
     boost::gregorian::date in_seven_day = today + boost::gregorian::days(7);
@@ -110,6 +115,7 @@ std::shared_ptr<DBSelectRequest> ClientMonitiringSystem::createPredictedRequestT
 std::shared_ptr<DBSelectRequest> ClientMonitiringSystem::createActualRequestToDB_()
 {
     std::shared_ptr<DBSelectRequest> request = std::make_shared<DBSelectRequest>();
+    request->_token = token_;
     request->_source = "reality_power_info";
     boost::gregorian::date today = boost::gregorian::day_clock::local_day();
     boost::gregorian::date before_seven_day = today - boost::gregorian::days(7);
@@ -120,10 +126,12 @@ std::shared_ptr<DBSelectRequest> ClientMonitiringSystem::createActualRequestToDB
     return request;
 };
 
-void ClientMonitiringSystem::setPredictedPowersInfo_(const db_value& value){
+void ClientMonitiringSystem::setPredictedPowersInfo_(const db_value &value)
+{
     auto predicted = std::make_shared<PredictedPowers>();
 
-    for(const auto& row: value){
+    for (const auto &row : value)
+    {
         PredictedPower val;
         val.date = row[2].c_str();
         val.generated_power = std::atof(row[3].c_str());
@@ -134,16 +142,19 @@ void ClientMonitiringSystem::setPredictedPowersInfo_(const db_value& value){
 
     predicted_powers_ = predicted;
 
-    if(predicted_powers_ && actual_powers_){
+    if (predicted_powers_ && actual_powers_)
+    {
         auto message_to_client = std::make_shared<ClientGraphsMessage>(*predicted_powers_, *actual_powers_);
         this->notifyDispatcher(Notification(Addressee::Messenger, BaseMessage(message_to_client)));
     }
 };
 
-void ClientMonitiringSystem::setActualPowersInfo_(const db_value& value){
+void ClientMonitiringSystem::setActualPowersInfo_(const db_value &value)
+{
     auto actual = std::make_shared<ActualPowers>();
 
-    for(const auto& row: value){
+    for (const auto &row : value)
+    {
         ActualPower val;
         val.date = row[2].c_str();
         val.solar = std::atof(row[3].c_str());
@@ -158,20 +169,23 @@ void ClientMonitiringSystem::setActualPowersInfo_(const db_value& value){
 
     actual_powers_ = actual;
 
-    if(predicted_powers_ && actual_powers_){
+    if (predicted_powers_ && actual_powers_)
+    {
         auto message_to_client = std::make_shared<ClientGraphsMessage>(*predicted_powers_, *actual_powers_);
         this->notifyDispatcher(Notification(Addressee::Messenger, BaseMessage(message_to_client)));
     }
 };
 
-void ClientMonitiringSystem::setConsumersInfo_(const db_value& value){
+void ClientMonitiringSystem::setConsumersInfo_(const db_value &value)
+{
     Consumers consumers;
     consumers.reserve(3);
 
-    for(const auto& row: value){
+    for (const auto &row : value)
+    {
         std::string val;
         val = row[2].c_str();
-        
+
         consumers[std::atoi(row[3].c_str()) - 1].push_back(val);
     };
 

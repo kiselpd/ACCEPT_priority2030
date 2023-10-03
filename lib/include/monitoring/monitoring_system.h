@@ -7,7 +7,7 @@
 class EspMonitoringSystem : public NotificationListener
 {
 public:
-    EspMonitoringSystem();
+    EspMonitoringSystem(const std::string& token);
     void getNotification(const Notification& notification) final;
     Addressee getName() const final;
 
@@ -18,12 +18,15 @@ private:
 
     std::shared_ptr<SensorsCondition> sensors_condition_;
     std::shared_ptr<ModeCondition> mode_condition_;
+
+    std::string token_;
 };
 
 
 class ClientMonitiringSystem : public NotificationListener
 {
 public:
+    ClientMonitiringSystem(const std::string& token);
     void getNotification(const Notification& notification) final;
     Addressee getName() const final;
 
@@ -39,6 +42,8 @@ private:
 
     std::shared_ptr<PredictedPowers> predicted_powers_;
     std::shared_ptr<ActualPowers> actual_powers_;
+
+    std::string token_;
 };
 
 #endif /*MONITORING_SYSTEM_H*/

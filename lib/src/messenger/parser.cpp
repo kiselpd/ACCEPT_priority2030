@@ -252,5 +252,5 @@ std::string graphs_to_json(const PredictedPowers& predicted_struct, const Actual
         std::cout << "Graphs to json error!" << std::endl;
         std::cerr << e.what() << '\n';
     }
-    
+    return str_json;
 };
