@@ -152,22 +152,6 @@ size_t ClientConsumersMessage::setJson(const std::string &json)
 };
 
 // ClientGraphsMessage
-// class ClientGraphsMessage : public ClientBaseMessage{
-// public:
-//     ClientGraphsMessage();
-//     ClientGraphsMessage(const PredictedPowers& predicted_struct, const ActualPowers& actual_struct);
-
-//     std::string getJson() const override;
-//     client_struct getStruct() const override;
-//     StructType getType() const override;
-
-//     size_t setJson(const std::string& json) override;
-
-// private:
-//     PredictedPowers predicted_struct_;
-//     ActualPowers actual_struct_;
-// };
-
 ClientGraphsMessage::ClientGraphsMessage(){};
 
 ClientGraphsMessage::ClientGraphsMessage(const PredictedPowers &predicted_struct, const ActualPowers &actual_struct) : predicted_struct_(predicted_struct),
@@ -184,5 +168,5 @@ client_struct ClientGraphsMessage::getStruct() const
 };
 
 size_t ClientGraphsMessage::setJson(const std::string& json) {
-    
+    return EXIT_FAILURE;
 };
