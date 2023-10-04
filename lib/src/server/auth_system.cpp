@@ -67,7 +67,6 @@ AuthSize EspAuthSystem::on_read_auth_size_(std::shared_ptr<boost::asio::ip::tcp:
             boost::asio::buffer(buffer.get(), sizeof(AuthSize)),
             sock_error);
 
-        std::cout << bytes_transfering_number << std::endl;
         if (!sock_error && bytes_transfering_number)
         {
             AuthSize *take_struct1 = reinterpret_cast<AuthSize *>(buffer.get());
@@ -112,7 +111,7 @@ std::string EspAuthSystem::on_read_password(std::shared_ptr<boost::asio::ip::tcp
 
     if (!sock_error && bytes_transfering_number)
         password = buffer_password.get();
-        password.pop_back();
+    password.pop_back();
 
     return password;
 };
@@ -163,8 +162,6 @@ std::shared_ptr<BaseSession> EspAuthSystem::authorizeNewSession(std::shared_ptr<
         {
             auto login = this->on_read_login(socket, auth_size.loginSize);
             auto password = this->on_read_password(socket, auth_size.passwordSize);
-
-            std::cout << "login size: " << auth_size.loginSize << "password size: " << auth_size.passwordSize << std::endl;
 
             if (!(login.empty() || password.empty()))
             {
@@ -273,12 +270,10 @@ size_t ClientAuthSystem::reciveRequest_(std::shared_ptr<boost::asio::ip::tcp::so
     {
         std::pair<int, std::string> info;
         parser_error = get_from_json(info, buffer_.getString());
-        std::cout << buffer_.getString() << std::endl;
         if (!parser_error)
         {
             message = std::make_shared<ClientAuthMessage>();
             parser_error = message->setJson(info.second);
-            std::cout << "auth req: " <<  message->getJson() << std::endl;
         }
     }
 

@@ -18,15 +18,12 @@ void EspMonitoringSystem::getNotification(const Notification &notification)
     switch (base_message.index())
     {
     case User::Esp:
-        std::cout <<"From esp" << std::endl;
         strategy = std::make_unique<StrategyMessageFromEsp>(sensors_condition_);
         break;
     case User::Client:
-        std::cout <<"From client" << std::endl;
         strategy = std::make_unique<StrategyMessageFromClient>(mode_condition_);
         break;
     case User::DB:
-        std::cout <<"From db" << std::endl;
         strategy = std::make_unique<StrategyMessageFromDB>(mode_condition_);
         break;
     default:

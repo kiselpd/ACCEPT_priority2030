@@ -10,7 +10,6 @@ Notification StrategyMessageFromEsp::process(const BaseMessage &base_message)
 
     if (message_from_esp->getType() == StructType::SENSORS_DATA)
     {
-        std::cout << "SENSORS from esp" << std::endl;
         sensors_condition_->updateCondition(std::get<Sensors>(message_from_esp->getStruct()));
         message_to_client = std::make_shared<ClientSensorsMessage>(sensors_condition_->getTmpCondition());
     }
