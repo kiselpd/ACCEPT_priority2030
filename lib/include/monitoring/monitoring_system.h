@@ -35,6 +35,7 @@ public:
 private:
     std::shared_ptr<DBSelectRequest> createPredictedRequestToDB_();
     std::shared_ptr<DBSelectRequest> createActualRequestToDB_();
+    std::shared_ptr<DBSelectRequest> createConsumersRequestToDB_();
 
     void setPredictedPowersInfo_(const db_value& value);
     void setActualPowersInfo_(const db_value& value);

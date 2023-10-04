@@ -23,6 +23,7 @@ void SessionManager::createSession(std::shared_ptr<boost::asio::ip::tcp::socket>
 
             auto friend_session_it = collection_->findSession(new_session->getId(), new_session->getFriend());
             if(friend_session_it != collection_->end()){
+                std::cout << "link mediator" << std::endl;
                 std::shared_ptr<SessionMediator> mediator = std::make_shared<SessionMediator>();
                 new_session->linkMediator(mediator);
                 (*friend_session_it)->linkMediator(mediator);

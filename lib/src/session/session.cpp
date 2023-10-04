@@ -46,6 +46,7 @@ void EspSession::linkMediator(std::shared_ptr<SessionMediator> mediator)
 
     dispatcher_->detachListener(Addressee::Mediator);
     dispatcher_->attachListener(colleague);
+    colleague->attachDispatcher(dispatcher_);
 };
 
 // ClientSession
@@ -62,4 +63,5 @@ void ClientSession::linkMediator(std::shared_ptr<SessionMediator> mediator)
 
     dispatcher_->detachListener(Addressee::Mediator);
     dispatcher_->attachListener(colleague);
+    colleague->attachDispatcher(dispatcher_);
 };

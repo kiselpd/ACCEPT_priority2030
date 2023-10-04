@@ -24,9 +24,13 @@ void SessionMediator::send(const Notification& notification, const User& colleag
     auto shared_esp = esp_.lock();
     auto shared_client = client_.lock();
     if((colleague_type == User::Esp) && shared_esp)
-            shared_esp->recive(notification);
+    {
+        shared_esp->recive(notification);
+    }
     if((colleague_type == User::Client) && shared_client)
+    {
         shared_client->recive(notification);
+    }
 };
 
 // BaseColleague
@@ -65,7 +69,7 @@ void ClientColleague::send(const Notification& notification){
 };
 
 void ClientColleague::recive(const Notification& notification){
-    this->notifyDispatcher(notification);
+    this->notifyDispatcher(Notification(Addressee::Messenger, notification.getMessage()));
 };
 
 User ClientColleague::getColleagueName() const{

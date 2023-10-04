@@ -24,11 +24,11 @@ FullSensors SensorsCondition::calculateFullSensors_(const Sensors& sensors_data)
     FullSensors full_sensors_data;
 
     full_sensors_data.solar = this->calculateFullSensor_(sensors_data.solar);
-    full_sensors_data.solar.percentages = full_sensors_data.solar.current * 20;
+    full_sensors_data.solar.percentages = full_sensors_data.solar.current / 3 * 100;
     full_sensors_data.wind = this->calculateFullSensor_(sensors_data.wind);
-    full_sensors_data.wind.percentages = full_sensors_data.wind.current * 20;
+    full_sensors_data.wind.percentages = full_sensors_data.wind.current / 3 * 100;
     full_sensors_data.generator = this->calculateFullSensor_(sensors_data.generator);
-    full_sensors_data.generator.percentages = full_sensors_data.generator.current * 20;
+    full_sensors_data.generator.percentages = full_sensors_data.generator.current * 100;
     full_sensors_data.battery = this->calculateFullBattery_(sensors_data);
 
     for (size_t i = 0; i < CONSUMERS_NUMBER; i++){
@@ -46,7 +46,7 @@ FullBattery SensorsCondition::calculateFullBattery_(const Sensors& sensors_data)
     if(sensors_data.generator.voltage > 100 && sensors_data.generator.current < 0.05)
         battery.voltage -= 2;
     battery.percentages = (battery.voltage - 7.2) / (14 - 7.2) * 100;
-    battery.status = ((sensors_data.solar.current + sensors_data.wind.current + sensors_data.generator.current) - (sensors_data.consumer[0].current + sensors_data.consumer[1].current + sensors_data.consumer[2].current) > 0) ? (1) : (0);
+    battery.status = ((sensors_data.solar.current * sensors_data.solar.voltage + sensors_data.wind.current * sensors_data.wind.voltage + sensors_data.generator.current * sensors_data.generator.voltage) - (sensors_data.consumer[0].current * sensors_data.consumer[0].voltage + sensors_data.consumer[1].current * sensors_data.consumer[1].voltage + sensors_data.consumer[2].current * sensors_data.consumer[2].current) > 0) ? (1) : (0);
 
     return battery;
 };

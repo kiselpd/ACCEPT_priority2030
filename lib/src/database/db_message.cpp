@@ -135,14 +135,6 @@ std::string DBDeleteRequest::createRequest() const{
     return str_request;
 };
 
-// class DBAuthRequest : public DBBaseMessage
-// {
-// public:
-//     std::string _login;
-//     std::string _password;
-
-//     std::string createRequest() const;
-// };
 // DBAuthRequest
 std::string DBAuthRequest::createRequest() const{
     std::string str_request;
@@ -157,6 +149,9 @@ std::string DBAuthRequest::createRequest() const{
         body["username"] = _login;
         body["password"] = _password;
 
+        request["header"] = header;
+        request["body"] = body;
+
         str_request = request.dump();
     }
 
@@ -165,7 +160,7 @@ std::string DBAuthRequest::createRequest() const{
 // DBBaseAnswer
 DBBaseAnswer::DBBaseAnswer(const std::string& str_json){
     nlohmann::json json = nlohmann::json::parse(str_json);
-    this->setStatus_(json);
+    this->setStatus_(json["header"]);
 
     if(status_ == 200){
         this->setCount_(json["body"]);
@@ -175,23 +170,23 @@ DBBaseAnswer::DBBaseAnswer(const std::string& str_json){
 };
 
 void DBBaseAnswer::setStatus_(const nlohmann::json& json){
-    if(json.contains("header")){
-        status_ = json["header"];
-        std::cout << "db status: " << status_ << std::endl;
+    if(json.contains("status")){
+        status_ = json["status"];
     }
 };
 
 void DBBaseAnswer::setCount_(const nlohmann::json& json){
     if(json.contains("count")){
         count_ = json["count"];
-        std::cout << "db size: " << count_ << std::endl;
     }
 };
 
 void DBBaseAnswer::setValue_(const nlohmann::json& json){
     if(json.contains("value")){
-        value_ = json["value"].get<db_value>();
-        std::cout << value_.size() << " " << value_[0].size() << std::endl;
+        if(json["value"].is_string())
+            value_.push_back(std::vector<std::string>{json["value"]});
+        else
+            value_ = json["value"].get<db_value>();
     }
 };
 

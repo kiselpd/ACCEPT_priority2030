@@ -62,6 +62,8 @@ private:
 
     std::shared_ptr<DBConnection> booked_connection_;
     std::shared_ptr<DBConnectionPool> pool_;
+
+    std::mutex mut_;
 };
 
 #endif /*BACKEND_H*/

@@ -33,7 +33,6 @@ size_t DBBackend::doRequest(std::shared_ptr<DBBaseMessage> request, std::shared_
     {
         std::string str_answer;
         error = on_read(str_answer);
-        std::cout << "BD answer: " << str_answer << std::endl;
         if (!error && !str_answer.empty())
         {
             answer = std::make_shared<DBBaseAnswer>(str_answer);
@@ -117,9 +116,10 @@ void DBAsyncBackend::send_handler_(const boost::system::error_code& error, std::
 
 void DBAsyncBackend::read_handler_(const boost::system::error_code& error, std::size_t bytes_transferred){
     if(!error && bytes_transferred){
-        pool_->setFreeConnection(std::move(booked_connection_));
+        if(booked_connection_)
+            pool_->setFreeConnection(std::move(booked_connection_));
+        
         std::shared_ptr<DBBaseMessage> answer = std::make_shared<DBBaseAnswer>(buffer_.getString());
-        std::cout << buffer_.getString() << std::endl;
         this->notifyDispatcher(Notification{Addressee::Monitoring_System, BaseMessage(answer)});
     }
     else

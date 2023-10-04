@@ -12,8 +12,7 @@ void BaseMessenger::stop(){
 };
 
 void BaseMessenger::getNotification(const Notification& notification){
-    auto base_message = notification.getMessage();
-    this->on_send_(base_message);
+    this->on_send_(notification.getMessage());
 };
 
 Addressee BaseMessenger::getName() const {return Addressee::Messenger;};
@@ -61,7 +60,7 @@ void EspMessenger::on_wait_(){
     timer_->async_wait(wait_handler);
 };
 
-void EspMessenger::on_send_(BaseMessage base_message){
+void EspMessenger::on_send_(const BaseMessage& base_message){
     if(base_message.index() == User::Esp){
         std::shared_ptr<EspBaseMessage> esp_base_message = std::get<std::shared_ptr<EspBaseMessage>>(base_message);
         auto buffer = esp_base_message->getBuffer();
@@ -149,16 +148,16 @@ void ClientMessenger::on_start_(){
     on_read_();
 };
 
-void ClientMessenger::on_send_(BaseMessage base_message){
+void ClientMessenger::on_send_(const BaseMessage &base_message){
     if(base_message.index() == User::Client){
-        std::shared_ptr<ClientBaseMessage> client_base_message = std::get<std::shared_ptr<ClientBaseMessage>>(base_message);
+        auto client_base_message = std::get<std::shared_ptr<ClientBaseMessage>>(base_message);
+
         auto send_handler = [this](const boost::system::error_code& error, std::size_t bytes_transferred) {
             this->send_handler_(error, bytes_transferred);
         };
-
-        std::cout << client_base_message->getJson() << std::endl;
+        
         socket_->async_write_some(
-            boost::asio::buffer(client_base_message->getJson()),
+            boost::asio::buffer(client_base_message->getJson() + "\n"),
             send_handler
         );
     }

@@ -10,6 +10,7 @@ Notification StrategyMessageFromEsp::process(const BaseMessage &base_message)
 
     if (message_from_esp->getType() == StructType::SENSORS_DATA)
     {
+        std::cout << "SENSORS from esp" << std::endl;
         sensors_condition_->updateCondition(std::get<Sensors>(message_from_esp->getStruct()));
         message_to_client = std::make_shared<ClientSensorsMessage>(sensors_condition_->getTmpCondition());
     }
@@ -51,7 +52,7 @@ Notification StrategyMessageFromDB::process(const BaseMessage &base_message)
 
     if (message_from_db->getStatus() == 200 && message_from_db->getAnswer().first)
     {
-        mode_condition_->updatePredictedDataCondition(std::atof(message_from_db->getAnswer().second[0][3].c_str()) / std::atof(message_from_db->getAnswer().second[0][4].c_str()));
+        mode_condition_->updatePredictedDataCondition(std::atof(message_from_db->getAnswer().second[0][3].c_str()) - std::atof(message_from_db->getAnswer().second[0][4].c_str()));
         message_to_esp = std::make_shared<EspModeMessage>(mode_condition_->getCondition());
     }
 

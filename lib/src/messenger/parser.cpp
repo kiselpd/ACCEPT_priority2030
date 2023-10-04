@@ -220,8 +220,8 @@ std::string graphs_to_json(const PredictedPowers& predicted_struct, const Actual
         for(const auto& elem: predicted_struct){
             auto elem_array = nlohmann::json::array(
             {(std::string)elem.date,
-            (double)elem.generated_power,
-            (double)elem.consumption_power});
+            (int)elem.generated_power,
+            (int)elem.consumption_power});
 
             prediction.push_back(elem_array);
         }
@@ -230,12 +230,12 @@ std::string graphs_to_json(const PredictedPowers& predicted_struct, const Actual
         for(const auto& elem: actual_struct){
             auto elem_array = nlohmann::json::array(
             {(std::string)elem.date,
-            (double)elem.solar,
-            (double)elem.wind,
-            (double)elem.generator,
-            (double)elem.consumer[0],
-            (double)elem.consumer[1],
-            (double)elem.consumer[2]});
+            (int)elem.solar,
+            (int)elem.wind,
+            (int)elem.generator,
+            (int)elem.consumer[0],
+            (int)elem.consumer[1],
+            (int)elem.consumer[2]});
 
             reality.push_back(elem_array);
         }
