@@ -18,7 +18,7 @@ public:
     void removeSession(std::vector<std::shared_ptr<BaseSession>> :: iterator session_it);
 
     std::vector<std::shared_ptr<BaseSession>>::iterator findSession(std::shared_ptr<BaseSession> session);
-    std::vector<std::shared_ptr<BaseSession>>::iterator findSession(const int& id, const User& owner);
+    std::vector<std::shared_ptr<BaseSession>>::iterator findSession(const std::string& id, const User& owner);
 
     void erasePassiveSession();
 

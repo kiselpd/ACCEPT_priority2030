@@ -104,13 +104,7 @@ struct FullPower
     friend FullPower operator/(const FullPower& power, const size_t& k);
 };
 
-struct Consumer
-{
-    std::string name;
-    double consumption;
-};
-
-typedef std::vector<std::vector<Consumer>> Consumers;
+typedef std::vector<std::vector<std::string>> Consumers;
 
 struct SwitchRelay // отправляется с сервера на есп о переключении реле
 {
@@ -121,8 +115,28 @@ struct SwitchRelay // отправляется с сервера на есп о 
 struct Mode // отправляется на есп о режиме работы
 {
     int mode;
-    int k; // какой-то коэффициент лучше пусть будет
+    double k; // какой-то коэффициент лучше пусть будет
 };
+
+struct PredictedPower
+{
+    std::string date;
+    double generated_power;
+    double consumption_power;
+};
+
+typedef std::vector<PredictedPower> PredictedPowers;
+
+struct ActualPower
+{
+    std::string date;
+    double solar;
+    double wind;
+    double generator;
+    double consumer[CONSUMERS_NUMBER];
+};
+
+typedef std::vector<ActualPower> ActualPowers;
 
 template<typename TStruct>
 TStruct get_struct(std::shared_ptr<char[]>& buffer){

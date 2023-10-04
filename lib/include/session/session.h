@@ -12,68 +12,53 @@
 class BaseSession : public std::enable_shared_from_this<BaseSession>
 {
 public:
-    BaseSession(const int& id);
+    BaseSession(const std::string& id);
 
     virtual User getOwner() const = 0;
     virtual User getFriend() const = 0;
 
     virtual void linkMediator(std::shared_ptr<SessionMediator> mediator) = 0;
-    void unlinkMediator();
-    void linkDatabase(std::shared_ptr<DBAsyncBackend> db);
-    
 
-    virtual void start(std::shared_ptr<boost::asio::ip::tcp::socket> new_socket, std::shared_ptr<boost::asio::deadline_timer> timer) = 0;
-    void stop();
+    void addListener(std::shared_ptr<NotificationListener> listener); 
+    void removeListener(const Addressee& addressee);
+
     bool getStatus() const;
+    std::shared_ptr<std::atomic<bool>> getSharedStatus();
 
-    int getId() const;  
+    std::string getId() const;  
 
 protected:
     std::shared_ptr<NotificationDispatcher> dispatcher_;
     std::shared_ptr<std::atomic<bool>> is_stopped_;
 
 private:
-    int id_;
+    std::string id_;
 };
 
 
 class EspSession : public BaseSession
 {
 public:
-    EspSession(const int& id);
+    EspSession(const std::string& id);
     ~EspSession(){std::cout << "esp session destructor" << std::endl;};
    
-    void linkMediator(std::shared_ptr<SessionMediator> mediator) override;
-
-    void start(std::shared_ptr<boost::asio::ip::tcp::socket> new_socket, std::shared_ptr<boost::asio::deadline_timer> timer) override;
-
     User getOwner() const override;
     User getFriend() const override;
 
-private:
-    void on_preparation_();
-    void on_energy_();
+    void linkMediator(std::shared_ptr<SessionMediator> mediator) final;
 };
 
 
 class ClientSession : public BaseSession
 {
 public:
-    ClientSession(const int& id);
+    ClientSession(const std::string& id);
     ~ClientSession(){std::cout << "client session destructor" << std::endl;};
-
-    void linkMediator(std::shared_ptr<SessionMediator> mediator) override;
-
-    void start(std::shared_ptr<boost::asio::ip::tcp::socket> new_socket, std::shared_ptr<boost::asio::deadline_timer> timer) override;
 
     User getOwner() const override;
     User getFriend() const override;
 
-private:
-    void on_preparation_();
-
-    void on_consumers_();
-    void on_energy_();
+    void linkMediator(std::shared_ptr<SessionMediator> mediator) final;
 };
 
 #endif /*SESSION_H*/

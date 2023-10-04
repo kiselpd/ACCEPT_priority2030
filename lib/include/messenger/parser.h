@@ -24,4 +24,6 @@ size_t get_switch_relay_from_json(SwitchRelay& t_struct, const std::string& str_
 
 std::string consumers_to_json(const Consumers& t_struct);
 
+std::string graphs_to_json(const PredictedPowers& predicted_struct, const ActualPowers& actual_struct);
+
 #endif /*PARSER_H*/
