@@ -9,7 +9,8 @@
 - [Автор](#автор)
 
 ## Технологии
-- WebSocket API
+- TCP/IP
+- API
 - TCP/IP
 - C++
 - boost 
